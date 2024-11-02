@@ -19,19 +19,20 @@ jobs:
         node-version: '16' # Ajusta según la versión que uses
 
     - name: Install dependencies
-      run: |
-        rm -rf node_modules package-lock.json
-        npm install --legacy-peer-deps
+      run: npm install --legacy-peer-deps
+
+    - name: Install missing dependency ajv
+      run: npm install ajv@6 --legacy-peer-deps
 
     - name: Build the project
-      run: set NODE_OPTIONS=--openssl-legacy-provider && CI=false npm run build
+      run: CI=false npm run build
 
     - name: Deploy to S3
       uses: jakejarvis/s3-sync-action@v0.5.1
       with:
         args: --delete
       env:
-        AWS_S3_BUCKET: carioca-backoffice-bucket-bbe0b98b
+        AWS_S3_BUCKET: carioca-front-bucket-ce8ea18c
         AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
         AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         AWS_REGION: us-east-1 # Ajusta según la región de tu bucket
