@@ -18,11 +18,18 @@ jobs:
       with:
         node-version: '16' # Ajusta según la versión que uses
 
-    - name: Clean and install dependencies
+    - name: Clean environment
       run: |
         rm -rf node_modules package-lock.json
-        npm install ajv@6 ajv-keywords@latest schema-utils@latest --legacy-peer-deps
-        npm install --legacy-peer-deps
+        npm cache clean --force
+
+    - name: Install specific dependencies
+      run: |
+        npm install ajv@6 ajv-keywords@3.5.2 --legacy-peer-deps
+        npm install schema-utils@2.7.1 --legacy-peer-deps
+
+    - name: Install project dependencies
+      run: npm install --legacy-peer-deps
 
     - name: Build the project
       run: set NODE_OPTIONS=--openssl-legacy-provider && CI=false npm run build
