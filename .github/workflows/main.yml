@@ -19,7 +19,7 @@ jobs:
         node-version: '20' # Ajusta según la versión que uses
 
     - name: Install dependencies
-      run: npm install
+      run: npm install --legacy-peer-deps
 
     - name: Build the project
       run: set NODE_OPTIONS=--openssl-legacy-provider && npm run build
