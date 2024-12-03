@@ -1,44 +1,58 @@
 import React from 'react'
-import { LineStyle, Timeline, TrendingUp, PermIdentity, Storefront, LocalAtm, Assessment, Drafts, Feedback, Forum, Work, Receipt, PieChart } from "@material-ui/icons";
+import { LineStyle, Timeline, TrendingUp, PermIdentity, Storefront, LocalAtm, Assessment, Drafts, Feedback, Forum, Work, Receipt, PieChart } from '@mui/icons-material';
 import styled, { css } from "styled-components";
 import { Link } from "react-router-dom";
+import {useHistory} from "react-router-dom"; 
 
 const SideBar = () => {
+    
+    const history = useHistory();
+    const handleInicioClick = () => {
+        history.push("/"); // Redirige al home
+      };
+    const handleUsuariosClick = () => {
+        history.push("/users"); // Redirige al home
+      };
+
+
+
+
+
     return (
         <SidebarContainer>
             <SidebarWrapper>
                 <SidebarMenu>
                     <SidebarTitle>Dashboard</SidebarTitle>
                     <SidebarList>
-                            <SidebarListItem>
-                                <MyLineStyle />
+                            <SidebarListItem onClick={handleInicioClick}>
+                                <MyLineStyle  />
                                 Inicio
                             </SidebarListItem>
-                        <SidebarListItem>
+                        {/* <SidebarListItem>
                             <MyTimeline />
                             Analiticas
-                        </SidebarListItem>
-                        <SidebarListItem>
+                        </SidebarListItem> */}
+                        {/* <SidebarListItem>
                             <MyTrendingUp />
                             Ventas
-                        </SidebarListItem>
+                        </SidebarListItem> */}
                     </SidebarList>
                 </SidebarMenu>
                 <SidebarMenu>
                     <SidebarTitle>Menu</SidebarTitle>
                     <SidebarList>
-                            <SidebarListItem>
+                            <SidebarListItem onClick={handleUsuariosClick}>
                                 <MyPermIdentity />
                                 Usuarios
                             </SidebarListItem>
-                            <SidebarListItem>
+                            {/* <SidebarListItem>
                                 <MyStorefront />
                                 Products
-                            </SidebarListItem>
-                        <SidebarListItem>
+                            </SidebarListItem> */}
+                        {/* <SidebarListItem>
                             <MyAssessment />
                             Reportes
-                        </SidebarListItem>
+                        </SidebarListItem> */}
                         <Link to="/Orders" style={{ textDecoration: 'none', color: 'inherit' }}>
                         <SidebarListItem>
                             <MyLocalAtm />

@@ -1,14 +1,19 @@
 import React from "react";
-import {Settings, Language, NotificationsNone} from '@material-ui/icons';
+import {Settings, Language, NotificationsNone} from '@mui/icons-material';
 import styled from "styled-components";
+import { useHistory } from "react-router-dom";
 
 const NavBar = () => {
   const rndNmr = () => Math.floor(Math.random() * 99) + 1;
+  const history = useHistory();
+  const handleLogoClick = () => {
+    history.push("/"); // Redirige al home
+  };
   return (
     <NavbarContainer>
       <NavbarWrapper>
         <TopLeft>
-          <Logo>React Admin</Logo>
+          <Logo onClick={handleLogoClick}>Portal Carioca</Logo>
         </TopLeft>
         <TopRight>
           <IconContainer>

@@ -1,6 +1,6 @@
 import React from "react";
 import styled from "styled-components";
-import { ArrowUpward } from "@material-ui/icons";
+import { ArrowUpward } from "@mui/icons-material";
 import {featuredData} from "../dummyData";
 
 const Featured = () => {

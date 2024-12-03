@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { DataGrid } from "@material-ui/data-grid";
+import { DataGrid } from "@mui/x-data-grid";
 import { userRows } from "../dummyData";
 import { Link } from "react-router-dom";
 import { TheList, ListItem, ListImage, EditButton, MyDeleteOutline } from "../styles/styled-elements";

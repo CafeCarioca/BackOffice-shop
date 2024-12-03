@@ -1,4 +1,4 @@
-import { CalendarToday, LocationSearching, MailOutline, PermIdentity, PhoneAndroid,Publish } from "@material-ui/icons";
+import { CalendarToday, LocationSearching, MailOutline, PermIdentity, PhoneAndroid,Publish } from "@mui/icons-material";
 import { Link } from "react-router-dom";
 import { ItemContainer, ItemTitleContainer, ItemAddButton, ItemShowImg, ItemUploadImg, ItemUpdateButton, ItemUpload } from "../styles/styled-elements"
 import styled from "styled-components";

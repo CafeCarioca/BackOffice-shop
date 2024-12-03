@@ -1,5 +1,5 @@
 import styled from "styled-components";
-import { DeleteOutline } from "@material-ui/icons";
+import { DeleteOutline } from "@mui/icons-material";
 export const TheList = styled.div`
     flex: 4;
 `
