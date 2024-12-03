@@ -2,7 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { DataGrid } from '@mui/x-data-grid';
 import { TheList, EditButton, MyDeleteOutline, ViewButton } from "../styles/styled-elements";
 import OrderDetails from './OrderDetails';
-import { fetchOrders } from '../services/orderservices';
+import { fetchOrders, deleteOrder, changeOrderStatus } from '../services/orderservices';
+import { sendEmailOnTheWay } from '../services/emailservices';
 import styled from 'styled-components';
 
 const OrderList = () => {
@@ -37,6 +38,12 @@ const OrderList = () => {
 
   const handleDelete = (id) => {
     setData(data.filter((item) => item.id !== id));
+
+    // Llama a la función para borrar el pedido
+    if (!window.confirm("Seguro que deseas borrar el pedido?")) {
+      return;
+    }
+    deleteOrder(id);
   };
 
   const handleView = (id) => {
@@ -46,6 +53,24 @@ const OrderList = () => {
   const handleClose = () => {
     setSelectedOrderId(null);
   };
+
+  const handleChangeOrderStatus = (id, status) => {
+    if (!window.confirm("Seguro que deseas cambiar el estado del pedido? Esto le notificará al cliente.")) {
+      return;
+    }
+    changeOrderStatus(id, status).then(() => {
+      setData(data.map(order => 
+        order.id === id ? { ...order, status: status } : order
+      ));
+      alert(`Estado del pedido actualizado a: ${status}`);
+      if (status === "En Camino") {
+        sendEmailOnTheWay(id);
+      }
+    }).catch(error => {
+      console.error("Error changing order status:", error);
+    });
+  };
+
 
   const columns = [
     { field: "id", headerName: "ID", width: 40 },
@@ -86,6 +111,14 @@ const OrderList = () => {
           <ModalContent>
             <CloseButton onClick={handleClose}>✖</CloseButton>
             <OrderDetails orderId={selectedOrderId} />
+            <div>
+              <EditButton onClick={() => handleChangeOrderStatus(selectedOrderId, "En Camino")} style={{ backgroundColor: 'orange' }}>
+                En Camino
+              </EditButton>
+              <EditButton onClick={() => handleChangeOrderStatus(selectedOrderId, "Entregado")} style={{ backgroundColor: 'green', marginLeft: '10px' }}>
+                Entregado
+              </EditButton>
+            </div>
           </ModalContent>
         </Modal>
       )}

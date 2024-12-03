@@ -33,4 +33,28 @@ const fetchOrders = async () => {
     }
   }
 
-  export { fetchOrders, fetchOrder };
+  const deleteOrder = async (orderId) => {
+    const apiUrl = `${API_ENDPOINTS.DELETE_ORDER}/${orderId}`;
+    try {
+      const response = await axios.delete(apiUrl);
+      console.log("Deleted order:", response.data);
+      return response.data;
+    } catch (error) {
+      console.error("Error deleting order:", error);
+      return null;
+    }
+  }
+
+const changeOrderStatus = async (orderId, newStatus) => {
+    const apiUrl = `${API_ENDPOINTS.CHANGE_STATUS}`;
+    try {
+        const response = await axios.put(apiUrl, { status: newStatus, orderId: orderId });
+        console.log("Changed order status:", response.data);
+        return response.data;
+    } catch (error) {
+        console.error("Error changing order status:", error);
+        return null;
+    }
+}
+
+  export { fetchOrders, fetchOrder, deleteOrder, changeOrderStatus };
