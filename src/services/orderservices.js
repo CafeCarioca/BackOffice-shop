@@ -4,8 +4,12 @@ import { API_ENDPOINTS } from "../apiConfig";
 
 const fetchOrders = async () => {
     const apiUrl = API_ENDPOINTS.GET_PAIDORDERS;
+    const headers = {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${process.env.REACT_APP_API_TOKEN}`
+    };
     try {
-      const response = await axios.get(apiUrl);
+      const response = await axios.get(apiUrl, { headers });
       const orders = response.data.orders;
       if (!Array.isArray(orders)) {
         console.error("Error: La propiedad 'orders' no es un array:", orders);
@@ -18,12 +22,16 @@ const fetchOrders = async () => {
     }
   };
 
-  const fetchOrder = async (orderId) => {
+const fetchOrder = async (orderId) => {
     const apiUrl = `${API_ENDPOINTS.GET_ORDER}/${orderId}`;
+    const headers = {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${process.env.REACT_APP_API_TOKEN}`
+    };
     console.log("Fetching order:", orderId);
     console.log("API URL:", apiUrl);
     try {
-      const response = await axios.get(apiUrl);
+      const response = await axios.get(apiUrl, { headers });
       const order = response.data.order;
       console.log("Fetched order:", order);
       return order;
@@ -33,22 +41,30 @@ const fetchOrders = async () => {
     }
   }
 
-  const deleteOrder = async (orderId) => {
+const deleteOrder = async (orderId) => {
     const apiUrl = `${API_ENDPOINTS.DELETE_ORDER}/${orderId}`;
+    const headers = {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${process.env.REACT_APP_API_TOKEN}`
+    };
     try {
-      const response = await axios.delete(apiUrl);
+      const response = await axios.delete(apiUrl, { headers });
       console.log("Deleted order:", response.data);
       return response.data;
     } catch (error) {
       console.error("Error deleting order:", error);
       return null;
     }
-  }
+}
 
 const changeOrderStatus = async (orderId, newStatus) => {
     const apiUrl = `${API_ENDPOINTS.CHANGE_STATUS}`;
+    const headers = {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${process.env.REACT_APP_API_TOKEN}`
+    };
     try {
-        const response = await axios.put(apiUrl, { status: newStatus, orderId: orderId });
+        const response = await axios.put(apiUrl, { status: newStatus, orderId: orderId }, { headers });
         console.log("Changed order status:", response.data);
         return response.data;
     } catch (error) {
