@@ -54,10 +54,16 @@ const SideBar = () => {
                             Reportes
                         </SidebarListItem> */}
                         <Link to="/Orders" style={{ textDecoration: 'none', color: 'inherit' }}>
-                        <SidebarListItem>
-                            <MyLocalAtm />
-                            Pedidos
-                        </SidebarListItem>
+                            <SidebarListItem>
+                                <MyLocalAtm />
+                                Pedidos
+                            </SidebarListItem>
+                        </Link>
+                        <Link to="/Products" style={{ textDecoration: 'none', color: 'inherit' }}>
+                            <SidebarListItem>
+                                <MyPermIdentity />
+                                Productos
+                            </SidebarListItem>
                         </Link>
                     </SidebarList>
                 </SidebarMenu>
