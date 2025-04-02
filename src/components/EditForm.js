@@ -15,24 +15,67 @@ const EditForm = ({ product, onClose, onUpdate }) => {
       updated[index][field] = value;
       setForm({ ...form, presentations: updated });
     };
-  
-    const handleSubmit = async (e) => {
-      e.preventDefault();
-      try {
-        const url = process.env.BACKEND_URL || "http://localhost:3000/"
-        await fetch(`${url}products/${product.id}`, {
-          method: 'PUT',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(form),
-        });
-        onUpdate(form);
-      } catch (error) {
-        console.error('Error al actualizar producto:', error);
+    const getChangedFields = (original, updated) => {
+      const changed = {};
+    
+      for (const key in updated) {
+        if (key === 'presentations') {
+          // Comparar presentaciones (asumimos que si cambia alguna, se manda todo)
+          const originalStr = JSON.stringify(original.presentations || []);
+          const updatedStr = JSON.stringify(updated.presentations || []);
+          if (originalStr !== updatedStr) {
+            changed.presentations = updated.presentations;
+          }
+        } else if (updated[key] !== original[key]) {
+          changed[key] = updated[key];
+        }
       }
+    
+      return changed;
     };
-  
+
+    
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        setError(null);
+      
+        const changes = getChangedFields(product, form);
+      
+        if (Object.keys(changes).length === 0) {
+          alert("No hay cambios para guardar.");
+          return;
+        }
+      
+        try {
+          const response = await fetch(`http://localhost:3000/products/${product.id}`, {
+            method: 'PUT',
+            headers: { 
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${process.env.REACT_APP_API_TOKEN}` 
+            },
+            body: JSON.stringify(changes),
+          });
+      
+          if (!response.ok) {
+            const data = await response.json();
+            throw new Error(data.message || "No se pudo actualizar el producto.");
+          }
+      
+          onUpdate({ ...product, ...changes }); // actualizás localmente también
+        } catch (error) {
+          console.error('Error al actualizar producto:', error);
+          setError(error.message || 'Ocurrió un error al actualizar el producto.');
+        }
+      };
+    
+    
+
+    const [error, setError] = useState(null);
+
     return (
-        <Form onSubmit={handleSubmit}>
+      
+      <Form onSubmit={handleSubmit}>
+          {error && <ErrorMessage>{error}</ErrorMessage>}
             <FormGroup>
                 <label>Nombre</label>
                 <input name="name" value={form.name} onChange={handleChange} />
@@ -161,4 +204,14 @@ const SaveButton = styled.button`
   &:hover {
     background-color: #2c4db0;
   }
+`;
+
+const ErrorMessage = styled.div`
+  background-color: #ffe5e5;
+  color: #b00020;
+  padding: 0.75rem 1rem;
+  border-radius: 8px;
+  margin-bottom: 1rem;
+  border: 1px solid #ffb3b3;
+  font-size: 0.95rem;
 `;

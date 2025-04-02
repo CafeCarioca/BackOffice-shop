@@ -142,8 +142,12 @@ const Products = () => {
             {products.map((product) => (
                 <Card key={product.id}>
                 <Title>{product.name}</Title>
-                <Price>${product.price}</Price>
-
+                <Price>
+                {product.presentations?.length > 0
+                    ? `Desde $${Math.min(...product.presentations.map(p => parseFloat(p.price))).toFixed(2)}`
+                    : `${product.price}`
+}
+                </Price>
                 <Presentations>
                 {product.presentations?.map((p, idx) => (
                     <li key={idx}>{p.weight} - ${p.price}</li>
