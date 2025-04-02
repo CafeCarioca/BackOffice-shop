@@ -34,6 +34,10 @@ const EditForm = ({ product, onClose, onUpdate }) => {
       return changed;
     };
 
+    const removePresentation = (index) => {
+      const updated = form.presentations.filter((_, i) => i !== index);
+      setForm({ ...form, presentations: updated });
+    };
     
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -110,6 +114,10 @@ const EditForm = ({ product, onClose, onUpdate }) => {
                 <label>Sabores</label>
                 <input name="flavors" value={form.flavors} onChange={handleChange} />
             </FormGroup>
+            <FormGroup>
+              <label>Precio</label>
+              <input name="price" type="number" value={form.price} onChange={handleChange} />
+            </FormGroup>
             </FormRow>
         
             <h4>Presentaciones</h4>
@@ -126,7 +134,9 @@ const EditForm = ({ product, onClose, onUpdate }) => {
                 onChange={(e) => handlePresentationChange(i, 'price', e.target.value)}
                 placeholder="Precio"
                 />
+            <RemoveButton type="button" onClick={() => removePresentation(i)}>✖</RemoveButton>
             </PresentationRow>
+
             ))}
         
             <SaveButton type="submit">Guardar cambios</SaveButton>
@@ -188,6 +198,19 @@ const PresentationRow = styled.div`
     border: 1px solid #ddd;
     border-radius: 8px;
     background-color: #f9f9f9;
+  }
+`;
+
+const RemoveButton = styled.button`
+  background: none;
+  border: none;
+  color: #b91c1c;
+  font-size: 1.2rem;
+  cursor: pointer;
+  align-self: center;
+
+  &:hover {
+    color: #7f1d1d;
   }
 `;
 
