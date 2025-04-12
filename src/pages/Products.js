@@ -108,20 +108,62 @@ const Products = () => {
 
     const toggleAvailability = async (id, available) => {
         const url = process.env.BACKEND_URL || "http://localhost:3000/";
-        await fetch(`${url}products/${id}`, {
-            method: 'PUT',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ available: !available })
-        })
-        .then(() => {
-            setProducts(products =>
-                products.map(p =>
-                    p.id === id ? { ...p, available: !available } : p
-                )
-            );
-        })
-        .catch(err => console.error('Error al cambiar disponibilidad:', err));
+        const headers = {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${process.env.REACT_APP_API_TOKEN}`
+        };
+    
+        const action = available ? 'desactivar' : 'activar';
+        const confirmed = window.confirm(`¿Estás seguro que querés ${action} este producto?`);
+    
+        if (!confirmed) return;
+    
+        if (available) {
+            // Desactivar (DELETE)
+            try {
+                const res = await fetch(`${url}products/${id}`, {
+                    method: 'DELETE',
+                    headers
+                });
+    
+                if (res.ok) {
+                    setProducts(products =>
+                        products.map(p =>
+                            p.id === id ? { ...p, available: false } : p
+                        )
+                    );
+                } else {
+                    console.error('Error al desactivar producto:', await res.json());
+                }
+            } catch (err) {
+                console.error('Error en el DELETE:', err);
+            }
+        } else {
+            // Activar (PUT)
+            try {
+                const res = await fetch(`${url}products/${id}`, {
+                    method: 'PUT',
+                    headers,
+                    body: JSON.stringify({ available: true })
+                });
+    
+                if (res.ok) {
+                    const updated = await res.json();
+                    setProducts(products =>
+                        products.map(p =>
+                            p.id === id ? updated : p
+                        )
+                    );
+                } else {
+                    console.error('Error al activar producto:', await res.json());
+                }
+            } catch (err) {
+                console.error('Error en el PUT:', err);
+            }
+        }
     };
+    
+    
 
     const handleEdit = (product) => {
         setSelectedProduct(product);
@@ -194,7 +236,7 @@ const Products = () => {
                             <Price>
                                 {product.presentations?.length > 0
                                     ? `Desde $${Math.min(...product.presentations.map(p => parseFloat(p.price))).toFixed(2)}`
-                                    : `${product.price}`
+                                    : `$${product.price}`
                                 }
                             </Price>
                             <Presentations>
