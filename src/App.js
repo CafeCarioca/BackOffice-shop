@@ -34,14 +34,6 @@ function App() {
 
   return (
     <Router>
-      {!isAuthenticated ? (
-        <Switch>
-          <Route path="/login">
-            <Login onLogin={handleLogin} />
-          </Route>
-          <Redirect to="/login" />
-        </Switch>
-      ) : (
         <>
           <NavBar onLogout={handleLogout}/>
           <div className="container">
@@ -68,7 +60,6 @@ function App() {
             </Switch>
           </div>
         </>
-      )}
     </Router>
   );
 }

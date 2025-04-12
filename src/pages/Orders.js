@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { DataGrid } from '@mui/x-data-grid';
 import { TheList, EditButton, MyDeleteOutline, ViewButton } from "../styles/styled-elements";
 import OrderDetails from './OrderDetails';
-import { fetchOrders, deleteOrder, changeOrderStatus } from '../services/orderservices';
+import { fetchOrdersByDateRange, fetchOrders, deleteOrder, changeOrderStatus } from '../services/orderservices';
 import { sendEmailOnTheWay } from '../services/emailservices';
 import styled from 'styled-components';
 
@@ -10,14 +10,20 @@ const OrderList = () => {
   const [selectedOrderId, setSelectedOrderId] = useState(null);
   const [loading, setLoading] = useState(true);
   const [data, setData] = useState([]);
+  const [filteredData, setFilteredData] = useState([]);
+  const [filters, setFilters] = useState({
+    status: '',
+    shippingType: '',
+    customerName: '',
+    startDate: '',
+    endDate: '',
+  });
 
   useEffect(() => {
     const loadOrders = async () => {
       setLoading(true);
       try {
         const orders = await fetchOrders();
-
-        // Procesa los datos aquí para añadir los campos calculados
         const processedData = orders.map(order => ({
           ...order,
           name: `${order.first_name} ${order.last_name}`,
@@ -26,6 +32,7 @@ const OrderList = () => {
         }));
 
         setData(processedData);
+        setFilteredData(processedData);
       } catch (error) {
         console.error("Error loading orders:", error);
       } finally {
@@ -36,14 +43,63 @@ const OrderList = () => {
     loadOrders();
   }, []);
 
-  const handleDelete = (id) => {
-    setData(data.filter((item) => item.id !== id));
+  const applyFilters = () => {
+    let filtered = data;
 
-    // Llama a la función para borrar el pedido
+    if (filters.status) {
+      filtered = filtered.filter(order => order.status === filters.status);
+    }
+    if (filters.shippingType) {
+      filtered = filtered.filter(order => order.shipping_type === filters.shippingType);
+    }
+    if (filters.customerName) {
+      filtered = filtered.filter(order => order.name.toLowerCase().includes(filters.customerName.toLowerCase()));
+    }
+
+    setFilteredData(filtered);
+  };
+
+  useEffect(() => {
+    applyFilters();
+  }, [filters.status, filters.shippingType, filters.customerName]);
+
+  const fetchFilteredData = async () => {
+    if (filters.startDate && filters.endDate) {
+      setLoading(true);
+      try {
+        const orders = await fetchOrdersByDateRange(filters.startDate, filters.endDate);
+        const processedData = orders.map(order => ({
+          ...order,
+          name: `${order.first_name} ${order.last_name}`,
+          formattedDate: new Date(order.order_date).toLocaleDateString(),
+          formattedTotal: `$${parseFloat(order.total).toFixed(2)}`
+        }));
+        setData(processedData);
+        setFilteredData(processedData);
+      } catch (error) {
+        console.error("Error fetching orders by date range:", error);
+      } finally {
+        setLoading(false);
+      }
+    } else {
+      alert("Por favor, seleccione ambas fechas: inicio y fin.");
+    }
+  };
+
+  const handleFilterChange = (e) => {
+    const { name, value } = e.target;
+    setFilters({
+      ...filters,
+      [name]: value,
+    });
+  };
+
+  const handleDelete = (id) => {
     if (!window.confirm("Seguro que deseas borrar el pedido?")) {
       return;
     }
     deleteOrder(id);
+    setData(data.filter((item) => item.id !== id));
   };
 
   const handleView = (id) => {
@@ -71,7 +127,6 @@ const OrderList = () => {
     });
   };
 
-
   const columns = [
     { field: "id", headerName: "ID", width: 40 },
     { field: "name", headerName: "Nombre Completo", width: 200 },
@@ -87,7 +142,36 @@ const OrderList = () => {
         <>
           <ViewButton onClick={() => handleView(params.row.id)}>Ver</ViewButton>
           <EditButton primary>Editar</EditButton>
-          <MyDeleteOutline onClick={() => handleDelete(params.row.id)} />
+          <MyDeleteOutline
+            onClick={() => {
+              if (
+                params.row.status !== "Pagado" &&
+                params.row.status !== "En Camino" &&
+                params.row.status !== "Entregado"
+              ) {
+                handleDelete(params.row.id);
+              }
+            }}
+            disabled={
+              params.row.status === "Pagado" ||
+              params.row.status === "En Camino" ||
+              params.row.status === "Entregado"
+            }
+            title={
+              params.row.status === "Pagado" ||
+              params.row.status === "En Camino" ||
+              params.row.status === "Entregado"
+                ? "No se puede borrar un pedido en este estado"
+                : ""
+            }
+            style={
+              params.row.status === "Pagado" ||
+              params.row.status === "En Camino" ||
+              params.row.status === "Entregado"
+                ? { cursor: "not-allowed", opacity: 0.5 }
+                : {}
+            }
+          />
         </>
       ),
     },
@@ -99,8 +183,66 @@ const OrderList = () => {
 
   return (
     <TheList>
+      <FilterContainer>
+        <FilterRow>
+          <FilterGroup>
+            <FilterLabel>Estado del Pedido:</FilterLabel>
+            <Select name="status" onChange={handleFilterChange}>
+              <option value="">Todos los Estados</option>
+              <option value="Pendiente">Pendiente</option>
+              <option value="Pagado">Pagado</option>
+              <option value="En Camino">En Camino</option>
+              <option value="Entregado">Entregado</option>
+            </Select>
+          </FilterGroup>
+
+          <FilterGroup>
+            <FilterLabel>Tipo de Envío:</FilterLabel>
+            <Select name="shippingType" onChange={handleFilterChange}>
+              <option value="">Todos los Tipos de Envío</option>
+              <option value="delivery">Delivery</option>
+              <option value="takeaway">Takeaway</option>
+            </Select>
+          </FilterGroup>
+
+          <FilterGroup>
+            <FilterLabel>Nombre del Cliente:</FilterLabel>
+            <Input type="text" name="customerName" placeholder="Nombre del Cliente" onChange={handleFilterChange} />
+          </FilterGroup>
+        </FilterRow>
+
+        <FilterRow>
+          <FilterGroup>
+            <FilterLabel>Fecha de Inicio:</FilterLabel>
+            <Input
+              type="date"
+              name="startDate"
+              value={filters.startDate}
+              onChange={handleFilterChange}
+            />
+          </FilterGroup>
+
+          <FilterGroup>
+            <FilterLabel>Fecha de Fin:</FilterLabel>
+            <Input
+              type="date"
+              name="endDate"
+              value={filters.endDate}
+              onChange={handleFilterChange}
+            />
+          </FilterGroup>
+
+          <Button 
+            onClick={fetchFilteredData} 
+            disabled={!filters.startDate || !filters.endDate}
+          >
+            Filtrar por fecha
+          </Button>
+        </FilterRow>
+      </FilterContainer>
+
       <DataGrid
-        rows={data}
+        rows={filteredData}
         disableSelectionOnClick
         columns={columns}
         pageSize={10}
@@ -128,6 +270,78 @@ const OrderList = () => {
 
 export default OrderList;
 
+const FilterContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  background-color: #f9f9f9;
+  padding: 15px;
+  border-radius: 8px;
+`;
+
+const FilterRow = styled.div`
+  display: flex;
+  gap: 20px;
+  margin-bottom: 10px;
+`;
+
+const FilterGroup = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+`;
+
+const FilterLabel = styled.label`
+  font-size: 14px;
+  font-weight: bold;
+`;
+
+const Select = styled.select`
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 16px;
+  color: #333;
+  outline: none;
+
+  &:focus {
+    border-color: #007BFF;
+  }
+`;
+
+const Input = styled.input`
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 16px;
+  color: #333;
+  outline: none;
+
+  &:focus {
+    border-color: #007BFF;
+  }
+`;
+
+const Button = styled.button`
+  padding: 10px 15px;
+  background-color: #007BFF;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  font-size: 16px;
+  cursor: pointer;
+  margin-top: 22px;
+  transition: background-color 0.3s;
+
+  &:disabled {
+    background-color: #ccc;
+    cursor: not-allowed;
+  }
+
+  &:hover:not(:disabled) {
+    background-color: #0056b3;
+  }
+`;
+
 const Modal = styled.div`
   position: fixed;
   top: 0;
@@ -141,6 +355,14 @@ const Modal = styled.div`
   z-index: 1000;
   animation: fadeIn 0.3s ease-in-out; 
 
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
 `;
 
 const ModalContent = styled.div`
@@ -154,6 +376,17 @@ const ModalContent = styled.div`
   border-radius: 12px;
   animation: slideIn 0.3s ease-in-out;
   overflow-y: auto;
+
+  @keyframes slideIn {
+    from {
+      transform: translateY(-20px);
+      opacity: 0;
+    }
+    to {
+      transform: translateY(0);
+      opacity: 1;
+    }
+  }
 `;
 
 const CloseButton = styled.button`
@@ -168,26 +401,6 @@ const CloseButton = styled.button`
   transition: color 0.2s;
 
   &:hover {
-      color: #ff0000;
-  }
-
-  @keyframes fadeIn {
-    from {
-      opacity: 0;
-    }
-    to {
-      opacity: 1;
-    }
-  }
-
-  @keyframes slideIn {
-    from {
-      transform: translateY(-20px);
-      opacity: 0;
-    }
-    to {
-      transform: translateY(0);
-      opacity: 1;
-    }
+    color: #ff0000;
   }
 `;
