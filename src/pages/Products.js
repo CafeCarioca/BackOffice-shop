@@ -94,7 +94,7 @@ const Products = () => {
 
     useEffect(() => {
         const fetchProducts = async () => {
-            const url = process.env.BACKEND_URL || "http://localhost:3000/";
+            const url = process.env.REACT_APP_API_URL || "http://localhost:3000/";
             try {
                 const response = await fetch(`${url}products`);
                 const data = await response.json();
@@ -107,7 +107,7 @@ const Products = () => {
     }, []);
 
     const toggleAvailability = async (id, available) => {
-        const url = process.env.BACKEND_URL || "http://localhost:3000/";
+        const url = process.env.REACT_APP_API_URL || "http://localhost:3000/";
         const headers = {
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${process.env.REACT_APP_API_TOKEN}`
@@ -181,7 +181,7 @@ const Products = () => {
     };
 
     const handleSaveProduct = async (productData) => {
-        const url = process.env.BACKEND_URL || "http://localhost:3000/";
+        const url = process.env.REACT_APP_API_URL || "http://localhost:3000/";
 
         const endpoint = isCreating ? `${url}products` : `${url}products/${productData.id}`;
         const method = isCreating ? 'POST' : 'PUT';

@@ -79,7 +79,7 @@ const EditForm = ({ product, onClose, onUpdate }) => {
     }
 
     try {
-      const url = process.env.BACKEND_URL || "http://localhost:3000/";
+      const url = process.env.REACT_APP_API_URL || "http://localhost:3000/";
       const endpoint = `${url}products/${product.id}`;
       const response = await fetch(endpoint, {
         method: 'PUT',

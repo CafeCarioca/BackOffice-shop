@@ -5,7 +5,6 @@ import { API_ENDPOINTS } from "../apiConfig";
 const fetchOrders = async () => {
   const apiUrl = API_ENDPOINTS.GET_ORDERS_BY_DATE;
   const today = new Date();
-  // Ajustamos las fechas para que sean solo de formato "YYYY-MM-DD"
   const startDate = new Date(today.getFullYear(), today.getMonth(), today.getDate() - 7).toISOString().split('T')[0];
   const endDate = new Date(today.getFullYear(), today.getMonth(), today.getDate() + 1).toISOString().split('T')[0];
   const body = {
@@ -19,7 +18,6 @@ const fetchOrders = async () => {
   };
 
   try {
-    // Cambia a POST para enviar el cuerpo con fechas
     const response = await axios.post(apiUrl, body, { headers });
     const orders = response.data.orders;
 

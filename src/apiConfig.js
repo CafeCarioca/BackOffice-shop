@@ -1,4 +1,4 @@
-const API_BASE_URL = process.env.BACKEND_URL || "http://localhost:3000";
+const API_BASE_URL = process.env.REACT_APP_API_URL || "http://localhost:3000";
 
 export const API_ENDPOINTS = {
  GET_ORDER: `${API_BASE_URL}/orders/get_order`,
