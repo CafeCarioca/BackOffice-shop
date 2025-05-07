@@ -32,26 +32,31 @@ const Modal = styled.div`
 `;
 
 const ModalContent = styled.div`
-    background: #fff;
-    padding: 2rem;
-    width: 100%;
-    max-width: 700px;
-    border-radius: 12px;
-    position: relative;
-    box-shadow: 0 0 25px rgba(0, 0, 0, 0.15);
-    animation: slideDown 0.3s ease;
+  background: #fff;
+  padding: 2rem;
+  width: 90%;
+  max-width: 700px;
+  border-radius: 12px;
+  position: relative;
+  box-shadow: 0 0 25px rgba(0, 0, 0, 0.15);
+  animation: slideDown 0.3s ease;
 
-    @keyframes slideDown {
-        from {
-            transform: translateY(-20px);
-            opacity: 0;
-        }
-        to {
-            transform: translateY(0);
-            opacity: 1;
-        }
+  /* 👇 Agregamos esto */
+  max-height: 90vh;
+  overflow-y: auto;
+
+  @keyframes slideDown {
+    from {
+      transform: translateY(-20px);
+      opacity: 0;
     }
+    to {
+      transform: translateY(0);
+      opacity: 1;
+    }
+  }
 `;
+
 
 const CloseButton = styled.button`
     position: absolute;
