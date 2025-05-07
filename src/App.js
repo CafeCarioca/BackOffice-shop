@@ -7,8 +7,8 @@ import UserList from './pages/UserList';
 import User from './pages/User';
 import Orders from './pages/Orders';
 import OrderDetails from './pages/OrderDetails';
-import Login from './pages/Login';
-import { BrowserRouter as Router, Switch, Route, Redirect } from "react-router-dom";
+import { BrowserRouter as Router, Switch, Route} from "react-router-dom";
+import Products from './pages/Products';
 
 function App() {
   const token = "123456abcdef" // Token de autenticación
@@ -49,7 +49,7 @@ function App() {
                 <User />
               </Route>
               <Route path="/products" exact>
-                <h1>Products</h1>
+                <Products />
               </Route>
               <Route path="/orders" exact>
                 <Orders />
