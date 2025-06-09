@@ -61,7 +61,7 @@ const SideBar = () => {
                         </Link>
                         <Link to="/Products" style={{ textDecoration: 'none', color: 'inherit' }}>
                             <SidebarListItem>
-                                <MyPermIdentity />
+                                <MyStorefront />
                                 Productos
                             </SidebarListItem>
                         </Link>

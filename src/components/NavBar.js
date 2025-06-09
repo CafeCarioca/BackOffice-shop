@@ -15,7 +15,7 @@ const NavBar = () => {
         <TopLeft>
           <Logo onClick={handleLogoClick}>Portal Carioca</Logo>
         </TopLeft>
-        <TopRight>
+        {/* <TopRight>
           <IconContainer>
             <NotificationsNone />
             <IconBadge>2</IconBadge>
@@ -26,9 +26,10 @@ const NavBar = () => {
           </IconContainer>
           <IconContainer>
             <Settings />
+            <IconBadge>2</IconBadge>
           </IconContainer>
           <Avatar src={`https://randomuser.me/api/portraits/women/${rndNmr()}.jpg`} alt="avatar"/>
-        </TopRight>
+        </TopRight> */}
       </NavbarWrapper>
     </NavbarContainer>
   );

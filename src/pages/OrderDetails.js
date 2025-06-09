@@ -109,6 +109,7 @@ const OrderDetails = ({ orderId }) => {
                 <p><strong>Estado:</strong> {address.state}</p>
                 <p><strong>Código Postal:</strong> {address.postalCode}</p>
                 <p><strong>País:</strong> {address.country}</p>
+                <p><strong>Observaciones:</strong> {user.remarks || 'Ninguna'}</p>
               </AddressGrid>
             </AddressSection>
           )}
@@ -118,6 +119,7 @@ const OrderDetails = ({ orderId }) => {
             <p>Estado: {orderData.status}</p>
             <p>Total: ${orderData.total}</p>
             <p>Tipo de Envío: {orderData.shippingType}</p>
+
           </Section>
         </div>
         <ProductSection>

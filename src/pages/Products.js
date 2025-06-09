@@ -94,9 +94,9 @@ const Products = () => {
 
     useEffect(() => {
         const fetchProducts = async () => {
-            const url = process.env.REACT_APP_API_URL || "http://localhost:3000/";
+            const url = process.env.REACT_APP_API_URL || "http://localhost:3000";
             try {
-                const response = await fetch(`${url}products`);
+                const response = await fetch(`${url}/products`);
                 const data = await response.json();
                 setProducts(data);
             } catch (err) {
@@ -107,7 +107,7 @@ const Products = () => {
     }, []);
 
     const toggleAvailability = async (id, available) => {
-        const url = process.env.REACT_APP_API_URL || "http://localhost:3000/";
+        const url = process.env.REACT_APP_API_URL || "http://localhost:3000";
         const headers = {
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${process.env.REACT_APP_API_TOKEN}`
@@ -121,7 +121,7 @@ const Products = () => {
         if (available) {
             // Desactivar (DELETE)
             try {
-                const res = await fetch(`${url}products/${id}`, {
+                const res = await fetch(`${url}/products/${id}`, {
                     method: 'DELETE',
                     headers
                 });
@@ -141,7 +141,7 @@ const Products = () => {
         } else {
             // Activar (PUT)
             try {
-                const res = await fetch(`${url}products/${id}`, {
+                const res = await fetch(`${url}/products/${id}`, {
                     method: 'PUT',
                     headers,
                     body: JSON.stringify({ available: true })
@@ -181,9 +181,9 @@ const Products = () => {
     };
 
     const handleSaveProduct = async (productData) => {
-        const url = process.env.REACT_APP_API_URL || "http://localhost:3000/";
+        const url = process.env.REACT_APP_API_URL || "http://localhost:3000";
 
-        const endpoint = isCreating ? `${url}products` : `${url}products/${productData.id}`;
+        const endpoint = isCreating ? `${url}/products` : `${url}products/${productData.id}`;
         const method = isCreating ? 'POST' : 'PUT';
 
 
