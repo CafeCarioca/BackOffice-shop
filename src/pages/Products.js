@@ -183,7 +183,7 @@ const Products = () => {
     const handleSaveProduct = async (productData) => {
         const url = process.env.REACT_APP_API_URL || "http://localhost:3000";
 
-        const endpoint = isCreating ? `${url}/products` : `${url}products/${productData.id}`;
+        const endpoint = isCreating ? `${url}/products` : `${url}/products/${productData.id}`;
         const method = isCreating ? 'POST' : 'PUT';
 
 

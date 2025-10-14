@@ -1,9 +1,11 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import styled from "styled-components";
 
 const EditForm = ({ product, onClose, onUpdate }) => {
   const [form, setForm] = useState({ ...product });
   const [error, setError] = useState(null);
+  // Guardamos el estado original para comparar después
+  const originalProduct = useRef(JSON.parse(JSON.stringify(product)));
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -34,29 +36,31 @@ const EditForm = ({ product, onClose, onUpdate }) => {
     for (const key in updated) {
       if (key === 'presentations') {
         const originalPres = (original.presentations || []).map(p => ({
-          weight: String(p.weight).trim(),
-          price: parseFloat(p.price)
+          weight: String(p.weight || '').trim(),
+          price: parseFloat(p.price) || 0
         }));
 
         const updatedPres = (updated.presentations || []).map(p => ({
-          weight: String(p.weight).trim(),
-          price: parseFloat(p.price)
+          weight: String(p.weight || '').trim(),
+          price: parseFloat(p.price) || 0
         }));
 
+        // Comparar longitud y cada elemento
         const isDifferent = originalPres.length !== updatedPres.length ||
-        originalPres.some((o, i) => {
-          const u = updatedPres[i];
-          return (
-            !u ||
-            o.weight.trim() !== u.weight.trim() ||
-            Number(o.price) !== Number(u.price)
-          );
-        });
+          originalPres.some((o, i) => {
+            const u = updatedPres[i];
+            if (!u) return true;
+            
+            const weightChanged = o.weight !== u.weight;
+            const priceChanged = Math.abs(o.price - u.price) > 0.001; // Tolerancia para decimales
+            
+            return weightChanged || priceChanged;
+          });
 
         if (isDifferent) {
           changed.presentations = updated.presentations.map(p => ({
-            weight: String(p.weight),
-            price: Number(p.price)
+            weight: String(p.weight).trim(),
+            price: parseFloat(p.price)
           }));
         }
       } else if (String(updated[key]) !== String(original[key])) {
@@ -71,7 +75,7 @@ const EditForm = ({ product, onClose, onUpdate }) => {
     e.preventDefault();
     setError(null);
 
-    const changes = getChangedFields(product, form);
+    const changes = getChangedFields(originalProduct.current, form);
 
     if (Object.keys(changes).length === 0) {
       alert("No hay cambios para guardar.");
@@ -79,8 +83,8 @@ const EditForm = ({ product, onClose, onUpdate }) => {
     }
 
     try {
-      const url = process.env.REACT_APP_API_URL || "http://localhost:3000/";
-      const endpoint = `${url}products/${product.id}`;
+      const url = process.env.REACT_APP_API_URL || "http://localhost:3000";
+      const endpoint = `${url}/products/${product.id}`;
       const response = await fetch(endpoint, {
         method: 'PUT',
         headers: {
@@ -95,7 +99,7 @@ const EditForm = ({ product, onClose, onUpdate }) => {
         throw new Error(data.message || "No se pudo actualizar el producto.");
       }
 
-      onUpdate({ ...product, ...changes });
+      onUpdate({ ...originalProduct.current, ...changes });
     } catch (error) {
       console.error('Error al actualizar producto:', error);
       setError(error.message || 'Ocurrió un error al actualizar el producto.');
@@ -148,16 +152,14 @@ const EditForm = ({ product, onClose, onUpdate }) => {
 
       <h4>Presentaciones</h4>
 {form.presentations?.map((p, i) => {
-  const isNew = p.weight === '' && p.price === '';
   return (
     <PresentationRow key={i}>
       <div>
         <label>Cantidad (g)</label>
         <input
           value={p.weight}
-          onChange={isNew ? (e) => handlePresentationChange(i, 'weight', e.target.value) : undefined}
+          onChange={(e) => handlePresentationChange(i, 'weight', e.target.value)}
           placeholder="Peso"
-          readOnly={!isNew}
         />
       </div>
       <div>
@@ -165,9 +167,8 @@ const EditForm = ({ product, onClose, onUpdate }) => {
         <input
           type="number"
           value={p.price}
-          onChange={isNew ? (e) => handlePresentationChange(i, 'price', e.target.value) : undefined}
+          onChange={(e) => handlePresentationChange(i, 'price', e.target.value)}
           placeholder="Precio"
-          readOnly={!isNew}
         />
       </div>
       <RemoveButton type="button" onClick={() => removePresentation(i)}>✖</RemoveButton>

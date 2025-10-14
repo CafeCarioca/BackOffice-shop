@@ -1,22 +1,33 @@
 import { Visibility } from "@mui/icons-material";
-import { newMemberRows } from "../dummyData";
+import { useEffect, useState } from "react";
+import { getRecentUsers } from "../services/dashboardServices";
 import styled from "styled-components";
 
 const SmWidget = () => {
+    const [users, setUsers] = useState([]);
+
+    useEffect(() => {
+        const loadUsers = async () => {
+            const data = await getRecentUsers(5);
+            setUsers(data);
+        };
+        loadUsers();
+    }, []);
+
     return (
         <SmWidgetContainer>
             <SmWidgetTitle>Nuevos Usuarios</SmWidgetTitle>
             <SmWidgetList>
-                {newMemberRows && newMemberRows.map(member => (
-                    <li key={member.id} className="SmWidgetListItem">
-                        <SmWidgetImg src={member.avatar} alt={member.username} />
+                {users && users.map(user => (
+                    <li key={user.id} className="SmWidgetListItem">
+                        <SmWidgetImg src={`https://ui-avatars.com/api/?name=${user.first_name}+${user.last_name}&background=random`} alt={user.username} />
                         <SmWidgetUser>
-                            <span className="SmWidgetUsername">{member.username}</span>
-                            <span className="SmWidgetUserTitle">{member.title}</span>
+                            <span className="SmWidgetUsername">{user.first_name} {user.last_name}</span>
+                            <span className="SmWidgetUserTitle">{user.email}</span>
                         </SmWidgetUser>
                         <SmWidgetButton>
                             <Visibility className="SmWidgetIcon" />
-                            Display
+                            Ver
                         </SmWidgetButton>
                     </li>
                 ))}

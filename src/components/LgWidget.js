@@ -1,34 +1,72 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import styled from "styled-components";
-import { lastTransctionRows } from "../dummyData";
+import { getRecentOrders } from "../services/dashboardServices";
 
 const LgWidget = () => {
+    const [orders, setOrders] = useState([]);
+
+    useEffect(() => {
+        const loadOrders = async () => {
+            const data = await getRecentOrders(5);
+            setOrders(data);
+        };
+        loadOrders();
+    }, []);
+
+    const getStatusStyle = (status) => {
+        switch(status.toLowerCase()) {
+            case 'approved':
+            case 'completada':
+                return { bgColor: "#e5faf2", fdColor: "#3bb077" };
+            case 'pending':
+            case 'pendiente':
+                return { bgColor: "#fff4e5", fdColor: "#e09f3e" };
+            case 'cancelled':
+            case 'cancelada':
+                return { bgColor: "#ffe5e5", fdColor: "#d32f2f" };
+            default:
+                return { bgColor: "#ebf1fe", fdColor: "#2a7ade" };
+        }
+    };
+
     return (
         <LgWidgetContainer>
-            <LgWidgetTitle>Ultimas transacciones</LgWidgetTitle>
+            <LgWidgetTitle>Últimas Órdenes</LgWidgetTitle>
             <LgWidgetTable>
-                <tr>
-                    <LgWidgetTh>Cliente</LgWidgetTh>
-                    <LgWidgetTh>Fecha</LgWidgetTh>
-                    <LgWidgetTh>Monto</LgWidgetTh>
-                    <LgWidgetTh>Estado</LgWidgetTh>
-                </tr>
-                {lastTransctionRows && lastTransctionRows.map(item => (
+                <thead>
                     <tr>
-                        <LgWidgetUser>
-                            <LgWidgetImg 
-                                src={item.avatar} 
-                                alt={item.username}
-                            />
-                            <span>{item.username}</span>
-                        </LgWidgetUser>
-                        <LightTd>{item.date}</LightTd>
-                        <LightTd>{item.transaction}</LightTd>
-                        <td>
-                            <LgWidgetButton bgcolor={item.bgColor} fdcolor={item.fdColor}>{item.type}</LgWidgetButton>
-                        </td>
+                        <LgWidgetTh>Cliente</LgWidgetTh>
+                        <LgWidgetTh>Fecha</LgWidgetTh>
+                        <LgWidgetTh>Monto</LgWidgetTh>
+                        <LgWidgetTh>Estado</LgWidgetTh>
                     </tr>
-                ))}
+                </thead>
+                <tbody>
+                    {orders && orders.map(order => {
+                        const statusStyle = getStatusStyle(order.status);
+                        return (
+                            <tr key={order.id}>
+                                <LgWidgetUser>
+                                    <LgWidgetImg 
+                                        src={`https://ui-avatars.com/api/?name=${order.user_name}&background=random`}
+                                        alt={order.user_name}
+                                    />
+                                    <span>{order.user_name}</span>
+                                </LgWidgetUser>
+                                <LightTd>{new Date(order.order_date).toLocaleDateString('es-ES')}</LightTd>
+                                <LightTd>${parseFloat(order.total).toFixed(2)}</LightTd>
+                                <td>
+                                    <LgWidgetButton 
+                                        bgcolor={statusStyle.bgColor} 
+                                        fdcolor={statusStyle.fdColor}
+                                    >
+                                        {order.status}
+                                    </LgWidgetButton>
+                                </td>
+                            </tr>
+                        );
+                    })}
+                </tbody>
             </LgWidgetTable>
         </LgWidgetContainer>
     )
