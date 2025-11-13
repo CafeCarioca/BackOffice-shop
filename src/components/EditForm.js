@@ -2,7 +2,10 @@ import { useState, useRef } from "react";
 import styled from "styled-components";
 
 const EditForm = ({ product, onClose, onUpdate }) => {
-  const [form, setForm] = useState({ ...product });
+  const [form, setForm] = useState({ 
+    ...product,
+    display_order: product.display_order || 999 
+  });
   const [error, setError] = useState(null);
   // Guardamos el estado original para comparar después
   const originalProduct = useRef(JSON.parse(JSON.stringify(product)));
@@ -75,7 +78,13 @@ const EditForm = ({ product, onClose, onUpdate }) => {
     e.preventDefault();
     setError(null);
 
-    const changes = getChangedFields(originalProduct.current, form);
+    // Convertir display_order a número antes de comparar
+    const formToSubmit = {
+      ...form,
+      display_order: form.display_order === '' || form.display_order === null || form.display_order === undefined ? 999 : parseInt(form.display_order)
+    };
+
+    const changes = getChangedFields(originalProduct.current, formToSubmit);
 
     if (Object.keys(changes).length === 0) {
       alert("No hay cambios para guardar.");
@@ -147,6 +156,17 @@ const EditForm = ({ product, onClose, onUpdate }) => {
         <FormGroup>
           <label>Precio</label>
           <input name="price" type="number" value={form.price} onChange={handleChange} />
+        </FormGroup>
+
+        <FormGroup>
+          <label>Orden de visualización</label>
+          <input 
+            name="display_order" 
+            type="number" 
+            value={form.display_order ?? 999} 
+            onChange={handleChange}
+            title="Número más bajo aparece primero (1, 2, 3...)"
+          />
         </FormGroup>
       </FormRow>
 

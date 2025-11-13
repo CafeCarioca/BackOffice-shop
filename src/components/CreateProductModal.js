@@ -11,6 +11,7 @@ const CreateProductModal = ({ onClose, onCreate }) => {
     flavors: '',
     price: '',
     available: true,
+    display_order: 999,
     presentations: []
   });
 
@@ -40,7 +41,12 @@ const CreateProductModal = ({ onClose, onCreate }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await onCreate(form);
+      // Convertir display_order a número antes de enviar
+      const formToSubmit = {
+        ...form,
+        display_order: form.display_order === '' || form.display_order === null || form.display_order === undefined ? 999 : parseInt(form.display_order)
+      };
+      await onCreate(formToSubmit);
     } catch (error) {
       console.error('Error al crear producto:', error);
     }
@@ -90,6 +96,17 @@ const CreateProductModal = ({ onClose, onCreate }) => {
             <FormGroup>
               <label>Precio base</label>
               <input name="price" type="number" value={form.price} onChange={handleChange} />
+            </FormGroup>
+
+            <FormGroup>
+              <label>Orden de visualización</label>
+              <input 
+                name="display_order" 
+                type="number" 
+                value={form.display_order} 
+                onChange={handleChange}
+                title="Número más bajo aparece primero (1, 2, 3...)"
+              />
             </FormGroup>
           </FormRow>
 

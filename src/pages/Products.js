@@ -14,6 +14,19 @@ const Grid = styled.div`
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
     gap: 1.5rem;
+    margin-bottom: 2rem;
+`;
+
+const CategorySection = styled.div`
+    margin-bottom: 2rem;
+`;
+
+const CategoryTitle = styled.h3`
+    font-size: 1.3rem;
+    color: #1e3a8a;
+    margin-bottom: 1rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 2px solid #e0e7ff;
 `;
 
 const Card = styled.div`
@@ -22,6 +35,28 @@ const Card = styled.div`
     border-radius: 10px;
     padding: 1rem;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.05);
+    position: relative;
+`;
+
+const OrderBadge = styled.span`
+    position: absolute;
+    top: 0.5rem;
+    right: 0.5rem;
+    background-color: #1e3a8a;
+    color: white;
+    font-size: 0.7rem;
+    font-weight: 600;
+    padding: 0.2rem 0.5rem;
+    border-radius: 5px;
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+    
+    &::after {
+        content: 'orden';
+        font-weight: 400;
+        opacity: 0.9;
+    }
 `;
 
 const Title = styled.h3`
@@ -208,6 +243,19 @@ const Products = () => {
         handleCloseModal();
     };
 
+    // Agrupar productos por categoría
+    const categoryNames = {
+        coffee: 'Café',
+        capsules: 'Cápsulas',
+        others: 'Otros'
+    };
+
+    const groupedProducts = {
+        coffee: products.filter(p => p.category === 'coffee'),
+        capsules: products.filter(p => p.category === 'capsules'),
+        others: products.filter(p => p.category === 'others')
+    };
+
     return (
         <TheList>
             <Container>
@@ -229,35 +277,45 @@ const Products = () => {
                     />
                 )}
 
-                <Grid>
-                    {products.map((product) => (
-                        <Card key={product.id}>
-                            <Title>{product.name}</Title>
-                            <Price>
-                                {product.presentations?.length > 0
-                                    ? `Desde $${Math.min(...product.presentations.map(p => parseFloat(p.price))).toFixed(2)}`
-                                    : `$${product.price}`
-                                }
-                            </Price>
-                            <Presentations>
-                                {product.presentations?.map((p, idx) => (
-                                    <li key={idx}>{p.weight} - ${p.price}</li>
+                {Object.entries(groupedProducts).map(([category, items]) => {
+                    if (items.length === 0) return null;
+                    
+                    return (
+                        <CategorySection key={category}>
+                            <CategoryTitle>{categoryNames[category]}</CategoryTitle>
+                            <Grid>
+                                {items.map((product) => (
+                                    <Card key={product.id}>
+                                        <OrderBadge>{product.display_order ?? 999}</OrderBadge>
+                                        <Title>{product.name}</Title>
+                                        <Price>
+                                            {product.presentations?.length > 0
+                                                ? `Desde $${Math.min(...product.presentations.map(p => parseFloat(p.price))).toFixed(2)}`
+                                                : `$${product.price}`
+                                            }
+                                        </Price>
+                                        <Presentations>
+                                            {product.presentations?.map((p, idx) => (
+                                                <li key={idx}>{p.weight} - ${p.price}</li>
+                                            ))}
+                                        </Presentations>
+
+                                        <Tag active={product.available}>
+                                            {product.available ? 'Disponible' : 'No disponible'}
+                                        </Tag>
+
+                                        <Actions>
+                                            <button className="edit" onClick={() => handleEdit(product)}>Editar</button>
+                                            <button className="toggle" onClick={() => toggleAvailability(product.id, product.available)}>
+                                                {product.available ? 'Desactivar' : 'Activar'}
+                                            </button>
+                                        </Actions>
+                                    </Card>
                                 ))}
-                            </Presentations>
-
-                            <Tag active={product.available}>
-                                {product.available ? 'Disponible' : 'No disponible'}
-                            </Tag>
-
-                            <Actions>
-                                <button className="edit" onClick={() => handleEdit(product)}>Editar</button>
-                                <button className="toggle" onClick={() => toggleAvailability(product.id, product.available)}>
-                                    {product.available ? 'Desactivar' : 'Activar'}
-                                </button>
-                            </Actions>
-                        </Card>
-                    ))}
-                </Grid>
+                            </Grid>
+                        </CategorySection>
+                    );
+                })}
             </Container>
         </TheList>
     );
