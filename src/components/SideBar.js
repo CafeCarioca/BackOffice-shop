@@ -1,5 +1,5 @@
 import React from 'react'
-import { LineStyle, Timeline, TrendingUp, PermIdentity, Storefront, LocalAtm, Assessment, Drafts, Feedback, Forum, Work, Receipt, PieChart } from '@mui/icons-material';
+import { LineStyle, Timeline, TrendingUp, PermIdentity, Storefront, LocalAtm, Assessment, Drafts, Feedback, Forum, Work, Receipt, PieChart, LocalOffer } from '@mui/icons-material';
 import styled, { css } from "styled-components";
 import { Link } from "react-router-dom";
 import {useHistory} from "react-router-dom"; 
@@ -65,6 +65,12 @@ const SideBar = () => {
                                 Productos
                             </SidebarListItem>
                         </Link>
+                        <Link to="/Discounts" style={{ textDecoration: 'none', color: 'inherit' }}>
+                            <SidebarListItem>
+                                <MyLocalOffer />
+                                Descuentos
+                            </SidebarListItem>
+                        </Link>
                     </SidebarList>
                 </SidebarMenu>
             </SidebarWrapper>
@@ -74,7 +80,8 @@ const SideBar = () => {
 export default SideBar
 
 const SidebarContainer = styled.div`
-    flex: 1;
+    flex: 0 0 200px;
+    width: 200px;
     height: calc(100vh - 50px);
     background-color: rgb(251, 251, 255);
     position: sticky;
@@ -128,6 +135,9 @@ const MyAssessment = styled(Assessment)`
     ${sharedStyle}
 `
 const MyLocalAtm = styled(LocalAtm)`
+    ${sharedStyle}
+`
+const MyLocalOffer = styled(LocalOffer)`
     ${sharedStyle}
 `
 const MyDrafts = styled(Drafts)`
