@@ -2,16 +2,16 @@ import React, { useEffect, useState } from "react";
 import styled from "styled-components";
 import { getTopProducts } from "../services/dashboardServices";
 
-const TopProducts = () => {
+const TopProducts = ({ month, year }) => {
     const [products, setProducts] = useState([]);
 
     useEffect(() => {
         const loadProducts = async () => {
-            const data = await getTopProducts(5);
+            const data = await getTopProducts(5, month, year);
             setProducts(data);
         };
         loadProducts();
-    }, []);
+    }, [month, year]);
 
     return (
         <Container>

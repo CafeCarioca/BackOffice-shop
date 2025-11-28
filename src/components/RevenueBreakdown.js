@@ -3,17 +3,17 @@ import styled from "styled-components";
 import { getFeaturedStats } from "../services/dashboardServices";
 import { TrendingUp, AccountBalance, AttachMoney } from "@mui/icons-material";
 
-const RevenueBreakdown = () => {
+const RevenueBreakdown = ({ month, year }) => {
     const [stats, setStats] = useState(null);
     const MP_COMMISSION = 0.0609; // 6.09% comisión Mercado Pago
 
     useEffect(() => {
         const loadStats = async () => {
-            const data = await getFeaturedStats();
+            const data = await getFeaturedStats(month, year);
             setStats(data);
         };
         loadStats();
-    }, []);
+    }, [month, year]);
 
     if (!stats) return <Container>Cargando...</Container>;
 

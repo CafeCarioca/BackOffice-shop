@@ -130,6 +130,11 @@ const OrderDetails = ({ orderId }) => {
                 {item.name} - Cantidad: {item.quantity} - Precio: ${item.price} - Grind: {item.grind} - Gramos: {item.grams}
               </li>
             ))}
+            {orderData.shippingType === 'delivery' && (
+              <li style={{ fontWeight: 'bold', color: '#666', marginTop: '10px' }}>
+                Envío - Cantidad: 1 - Precio: $180.00
+              </li>
+            )}
           </ul>
         </ProductSection>
       </DetailsGrid>

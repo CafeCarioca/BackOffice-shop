@@ -7,9 +7,10 @@ const headers = {
 };
 
 // Obtener estadísticas principales
-export const getFeaturedStats = async () => {
+export const getFeaturedStats = async (month, year) => {
   try {
-    const response = await fetch(`${API_URL}/dashboard/stats`, { headers });
+    const params = month && year ? `?month=${month}&year=${year}` : '';
+    const response = await fetch(`${API_URL}/dashboard/stats${params}`, { headers });
     if (!response.ok) throw new Error('Error al obtener estadísticas');
     return await response.json();
   } catch (error) {
@@ -62,9 +63,10 @@ export const getRecentOrders = async (limit = 5) => {
 };
 
 // Obtener productos más vendidos
-export const getTopProducts = async (limit = 5) => {
+export const getTopProducts = async (limit = 5, month, year) => {
   try {
-    const response = await fetch(`${API_URL}/dashboard/top-products?limit=${limit}`, { headers });
+    const params = month && year ? `&month=${month}&year=${year}` : '';
+    const response = await fetch(`${API_URL}/dashboard/top-products?limit=${limit}${params}`, { headers });
     if (!response.ok) throw new Error('Error al obtener productos más vendidos');
     return await response.json();
   } catch (error) {

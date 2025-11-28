@@ -3,20 +3,20 @@ import styled from "styled-components";
 import { ArrowUpward, ArrowDownward } from "@mui/icons-material";
 import { getFeaturedStats, getTopProducts } from "../services/dashboardServices";
 
-const Featured = () => {
+const Featured = ({ month, year }) => {
     const [stats, setStats] = useState(null);
     const [topProduct, setTopProduct] = useState(null);
 
     useEffect(() => {
         const loadData = async () => {
-            const statsData = await getFeaturedStats();
-            const topProductsData = await getTopProducts(1);
+            const statsData = await getFeaturedStats(month, year);
+            const topProductsData = await getTopProducts(1, month, year);
             
             setStats(statsData);
             setTopProduct(topProductsData[0] || null);
         };
         loadData();
-    }, []);
+    }, [month, year]);
 
     if (!stats) return <FeaturedContainer>Cargando...</FeaturedContainer>;
 
