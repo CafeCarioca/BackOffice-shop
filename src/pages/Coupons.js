@@ -2,62 +2,51 @@ import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import axios from 'axios';
 import { API_ENDPOINTS } from '../apiConfig';
-import CreateDiscountModal from '../components/CreateDiscountModal';
-import EditDiscountModal from '../components/EditDiscountModal';
+import CreateCouponModal from '../components/CreateCouponModal';
+import EditCouponModal from '../components/EditCouponModal';
 
-const Discounts = () => {
-  const [discounts, setDiscounts] = useState([]);
-  const [products, setProducts] = useState([]);
+const Coupons = () => {
+  const [coupons, setCoupons] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showCreateModal, setShowCreateModal] = useState(false);
-  const [editingDiscount, setEditingDiscount] = useState(null);
+  const [editingCoupon, setEditingCoupon] = useState(null);
 
   useEffect(() => {
-    fetchDiscounts();
-    fetchProducts();
+    fetchCoupons();
   }, []);
 
-  const fetchDiscounts = async () => {
+  const fetchCoupons = async () => {
     try {
-      const response = await axios.get(API_ENDPOINTS.GET_DISCOUNTS);
-      setDiscounts(response.data);
+      const response = await axios.get(API_ENDPOINTS.GET_COUPONS);
+      setCoupons(response.data);
       setLoading(false);
     } catch (error) {
-      console.error('Error al obtener descuentos:', error);
+      console.error('Error al obtener cupones:', error);
       setLoading(false);
-    }
-  };
-
-  const fetchProducts = async () => {
-    try {
-      const response = await axios.get(API_ENDPOINTS.GET_PRODUCTS);
-      setProducts(response.data);
-    } catch (error) {
-      console.error('Error al obtener productos:', error);
     }
   };
 
   const handleDelete = async (id) => {
-    if (window.confirm('¿Estás seguro de eliminar este descuento?')) {
+    if (window.confirm('¿Estás seguro de eliminar este cupón?')) {
       try {
-        await axios.delete(`${API_ENDPOINTS.DELETE_DISCOUNT}/${id}`);
-        fetchDiscounts();
+        await axios.delete(`${API_ENDPOINTS.DELETE_COUPON}/${id}`);
+        fetchCoupons();
       } catch (error) {
-        console.error('Error al eliminar descuento:', error);
-        alert('Error al eliminar descuento');
+        console.error('Error al eliminar cupón:', error);
+        alert('Error al eliminar cupón');
       }
     }
   };
 
-  const handleToggleActive = async (discount) => {
+  const handleToggleActive = async (coupon) => {
     try {
-      await axios.put(`${API_ENDPOINTS.UPDATE_DISCOUNT}/${discount.id}`, {
-        is_active: !discount.is_active
+      await axios.put(`${API_ENDPOINTS.UPDATE_COUPON}/${coupon.id}`, {
+        is_active: !coupon.is_active
       });
-      fetchDiscounts();
+      fetchCoupons();
     } catch (error) {
-      console.error('Error al actualizar descuento:', error);
-      alert('Error al actualizar descuento');
+      console.error('Error al actualizar cupón:', error);
+      alert('Error al actualizar cupón');
     }
   };
 
@@ -66,83 +55,101 @@ const Discounts = () => {
     return new Date(date).toLocaleDateString('es-UY');
   };
 
-  const isActive = (discount) => {
-    if (!discount.is_active) return false;
+  const isActive = (coupon) => {
+    if (!coupon.is_active) return false;
     
     const now = new Date();
-    const start = discount.start_date ? new Date(discount.start_date) : null;
-    const end = discount.end_date ? new Date(discount.end_date) : null;
+    const start = coupon.start_date ? new Date(coupon.start_date) : null;
+    const end = coupon.end_date ? new Date(coupon.end_date) : null;
 
     if (start && now < start) return false;
     if (end && now > end) return false;
+
+    // Verificar si alcanzó el máximo de usos
+    if (coupon.max_uses && coupon.current_uses >= coupon.max_uses) return false;
 
     return true;
   };
 
   if (loading) {
-    return <Container><p>Cargando descuentos...</p></Container>;
+    return <Container><p>Cargando cupones...</p></Container>;
   }
 
   return (
     <Container>
       <Header>
-        <Title>Gestión de Descuentos</Title>
+        <Title>Gestión de Cupones</Title>
         <CreateButton onClick={() => setShowCreateModal(true)}>
-          + Crear Descuento
+          + Crear Cupón
         </CreateButton>
       </Header>
 
-      <DiscountsGrid>
-        {discounts.map(discount => (
-          <DiscountCard key={discount.id}>
+      <CouponsGrid>
+        {coupons.map(coupon => (
+          <CouponCard key={coupon.id}>
             <CardHeader>
-              <DiscountName>{discount.name}</DiscountName>
+              <CouponCode>{coupon.code}</CouponCode>
               <BadgeContainer>
-                <StatusBadge active={isActive(discount)}>
-                  {isActive(discount) ? 'ACTIVO' : 'INACTIVO'}
+                <StatusBadge active={isActive(coupon)}>
+                  {isActive(coupon) ? 'ACTIVO' : 'INACTIVO'}
                 </StatusBadge>
-                <DeliveryTypeBadge deliveryType={discount.delivery_type || 'both'}>
-                  {discount.delivery_type === 'delivery' ? '🚚 Delivery' : 
-                   discount.delivery_type === 'takeaway' ? '🏪 TakeAway' : 
+                <DeliveryTypeBadge deliveryType={coupon.delivery_type || 'both'}>
+                  {coupon.delivery_type === 'delivery' ? '🚚 Delivery' : 
+                   coupon.delivery_type === 'takeaway' ? '🏪 TakeAway' : 
                    '🚚🏪 Ambos'}
                 </DeliveryTypeBadge>
               </BadgeContainer>
             </CardHeader>
 
-            {discount.description && (
-              <Description>{discount.description}</Description>
+            <CouponName>{coupon.name}</CouponName>
+
+            {coupon.description && (
+              <Description>{coupon.description}</Description>
             )}
 
             <InfoRow>
               <InfoLabel>Tipo:</InfoLabel>
               <InfoValue>
-                {discount.discount_type === 'percentage' ? 'Porcentaje' : 'Monto fijo'}
+                {coupon.discount_type === 'percentage' ? 'Porcentaje' : 'Monto fijo'}
               </InfoValue>
             </InfoRow>
 
             <InfoRow>
               <InfoLabel>Valor:</InfoLabel>
-              <DiscountValue type={discount.discount_type}>
-                {discount.discount_type === 'percentage' 
-                  ? `${discount.discount_value}%` 
-                  : `$${discount.discount_value}`}
+              <DiscountValue type={coupon.discount_type}>
+                {coupon.discount_type === 'percentage' 
+                  ? `${coupon.discount_value}%` 
+                  : `$${coupon.discount_value}`}
               </DiscountValue>
             </InfoRow>
 
-            <InfoRow>
-              <InfoLabel>Productos:</InfoLabel>
-              <InfoValue>{discount.product_count || 0} productos</InfoValue>
-            </InfoRow>
+            {coupon.min_purchase_amount > 0 && (
+              <InfoRow>
+                <InfoLabel>Compra mínima:</InfoLabel>
+                <InfoValue>${coupon.min_purchase_amount}</InfoValue>
+              </InfoRow>
+            )}
 
-            {(discount.start_date || discount.end_date) && (
+            {coupon.max_uses && (
+              <InfoRow>
+                <InfoLabel>Usos:</InfoLabel>
+                <UsageValue>
+                  {coupon.current_uses} / {coupon.max_uses}
+                  {coupon.current_uses >= coupon.max_uses && 
+                    <UsageWarning> ⚠️</UsageWarning>}
+                </UsageValue>
+              </InfoRow>
+            )}
+
+            {(coupon.start_date || coupon.end_date) && (
               <DateInfo>
                 <InfoRow>
                   <InfoLabel>Inicio:</InfoLabel>
-                  <InfoValue>{formatDate(discount.start_date)}</InfoValue>
+                  <InfoValue>{formatDate(coupon.start_date)}</InfoValue>
                 </InfoRow>
                 <InfoRow>
                   <InfoLabel>Fin:</InfoLabel>
-                  <InfoValue>{formatDate(discount.end_date)}</InfoValue>
+                  <InfoValue>{formatDate(coupon.end_date)}</InfoValue>
                 </InfoRow>
               </DateInfo>
             )}
@@ -150,63 +157,59 @@ const Discounts = () => {
             <Actions>
               <ActionButton 
                 color="#2196F3" 
-                onClick={() => setEditingDiscount(discount)}
+                onClick={() => setEditingCoupon(coupon)}
               >
                 Editar
               </ActionButton>
               <ActionButton 
-                color={discount.is_active ? "#FF9800" : "#4CAF50"}
-                onClick={() => handleToggleActive(discount)}
+                color={coupon.is_active ? "#FF9800" : "#4CAF50"}
+                onClick={() => handleToggleActive(coupon)}
               >
-                {discount.is_active ? 'Desactivar' : 'Activar'}
+                {coupon.is_active ? 'Desactivar' : 'Activar'}
               </ActionButton>
               <ActionButton 
                 color="#f44336" 
-                onClick={() => handleDelete(discount.id)}
+                onClick={() => handleDelete(coupon.id)}
               >
                 Eliminar
               </ActionButton>
             </Actions>
-          </DiscountCard>
+          </CouponCard>
         ))}
 
-        {discounts.length === 0 && (
+        {coupons.length === 0 && (
           <EmptyState>
-            <p>No hay descuentos creados</p>
+            <p>No hay cupones creados</p>
             <CreateButton onClick={() => setShowCreateModal(true)}>
               Crear el primero
             </CreateButton>
           </EmptyState>
         )}
-      </DiscountsGrid>
+      </CouponsGrid>
 
       {showCreateModal && (
-        <CreateDiscountModal
-          products={products}
+        <CreateCouponModal
           onClose={() => setShowCreateModal(false)}
           onSuccess={() => {
             setShowCreateModal(false);
-            fetchDiscounts();
+            fetchCoupons();
           }}
         />
       )}
 
-      {editingDiscount && (
-        <EditDiscountModal
-          discount={editingDiscount}
-          products={products}
-          onClose={() => setEditingDiscount(null)}
+      {editingCoupon && (
+        <EditCouponModal
+          coupon={editingCoupon}
+          onClose={() => setEditingCoupon(null)}
           onSuccess={() => {
-            setEditingDiscount(null);
-            fetchDiscounts();
+            setEditingCoupon(null);
+            fetchCoupons();
           }}
         />
       )}
     </Container>
   );
 };
-
-export default Discounts;
 
 // Styled Components
 const Container = styled.div`
@@ -244,7 +247,7 @@ const CreateButton = styled.button`
   }
 `;
 
-const DiscountsGrid = styled.div`
+const CouponsGrid = styled.div`
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
   gap: 1rem;
@@ -260,7 +263,7 @@ const DiscountsGrid = styled.div`
   }
 `;
 
-const DiscountCard = styled.div`
+const CouponCard = styled.div`
   background: white;
   border-radius: 10px;
   padding: 1.2rem;
@@ -284,18 +287,38 @@ const CardHeader = styled.div`
   gap: 0.5rem;
 `;
 
-const DiscountName = styled.h3`
+const CouponCode = styled.h3`
   font-size: 17px;
-  font-weight: 600;
-  color: #333;
+  font-weight: 700;
+  color: #58000a;
   margin: 0;
   flex: 1;
+  line-height: 1.3;
+  font-family: 'Courier New', Courier, monospace;
+  letter-spacing: 1px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+`;
+
+const CouponName = styled.div`
+  font-size: 14px;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 0.8rem;
   line-height: 1.3;
   overflow: hidden;
   text-overflow: ellipsis;
   display: -webkit-box;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
+`;
+
+const BadgeContainer = styled.div`
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+  flex-wrap: wrap;
 `;
 
 const StatusBadge = styled.span`
@@ -308,13 +331,6 @@ const StatusBadge = styled.span`
   letter-spacing: 0.5px;
   white-space: nowrap;
   flex-shrink: 0;
-`;
-
-const BadgeContainer = styled.div`
-  display: flex;
-  gap: 0.5rem;
-  align-items: center;
-  flex-wrap: wrap;
 `;
 
 const DeliveryTypeBadge = styled.span`
@@ -368,6 +384,17 @@ const DiscountValue = styled.span`
   font-weight: 700;
 `;
 
+const UsageValue = styled.span`
+  color: #333;
+  font-size: 13px;
+  font-weight: 500;
+`;
+
+const UsageWarning = styled.span`
+  color: #f44336;
+  font-size: 12px;
+`;
+
 const DateInfo = styled.div`
   margin-top: 0.8rem;
   padding-top: 0.8rem;
@@ -412,3 +439,5 @@ const EmptyState = styled.div`
     margin-bottom: 1rem;
   }
 `;
+
+export default Coupons;

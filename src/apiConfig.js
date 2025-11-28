@@ -21,6 +21,15 @@ export const API_ENDPOINTS = {
   ADD_PRODUCTS_TO_DISCOUNT: `${API_BASE_URL}/discounts`,
   GET_DISCOUNT_PRODUCTS: `${API_BASE_URL}/discounts`,
   
+  // Cupones
+  GET_COUPONS: `${API_BASE_URL}/coupons`,
+  GET_COUPON: `${API_BASE_URL}/coupons`,
+  CREATE_COUPON: `${API_BASE_URL}/coupons`,
+  UPDATE_COUPON: `${API_BASE_URL}/coupons`,
+  DELETE_COUPON: `${API_BASE_URL}/coupons`,
+  VALIDATE_COUPON: `${API_BASE_URL}/coupons/validate`,
+  INCREMENT_COUPON_USAGE: `${API_BASE_URL}/coupons`,
+  
   // Products
   GET_PRODUCTS: `${API_BASE_URL}/products`,
 

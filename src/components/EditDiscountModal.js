@@ -10,6 +10,7 @@ const EditDiscountModal = ({ discount, products, onClose, onSuccess }) => {
     discount_type: 'percentage',
     discount_value: '',
     is_active: true,
+    delivery_type: 'both',
     start_date: '',
     end_date: '',
     product_ids: []
@@ -34,6 +35,7 @@ const EditDiscountModal = ({ discount, products, onClose, onSuccess }) => {
         discount_type: discountData.discount_type || 'percentage',
         discount_value: discountData.discount_value || '',
         is_active: discountData.is_active ?? true,
+        delivery_type: discountData.delivery_type || 'both',
         start_date: discountData.start_date ? discountData.start_date.split('T')[0] : '',
         end_date: discountData.end_date ? discountData.end_date.split('T')[0] : '',
         product_ids: discountData.products ? discountData.products.map(p => p.id) : []
@@ -100,6 +102,7 @@ const EditDiscountModal = ({ discount, products, onClose, onSuccess }) => {
         discount_type: form.discount_type,
         discount_value: parseFloat(form.discount_value),
         is_active: form.is_active,
+        delivery_type: form.delivery_type,
         start_date: form.start_date || null,
         end_date: form.end_date || null
       });
@@ -255,6 +258,42 @@ const EditDiscountModal = ({ discount, products, onClose, onSuccess }) => {
               />
               Descuento activo
             </CheckboxLabel>
+          </FormGroup>
+
+          <FormGroup>
+            <Label>Tipo de entrega *</Label>
+            <RadioGroup>
+              <RadioLabel>
+                <input
+                  type="radio"
+                  name="delivery_type"
+                  value="both"
+                  checked={form.delivery_type === 'both'}
+                  onChange={handleChange}
+                />
+                Ambos (Delivery y TakeAway)
+              </RadioLabel>
+              <RadioLabel>
+                <input
+                  type="radio"
+                  name="delivery_type"
+                  value="delivery"
+                  checked={form.delivery_type === 'delivery'}
+                  onChange={handleChange}
+                />
+                Solo Delivery
+              </RadioLabel>
+              <RadioLabel>
+                <input
+                  type="radio"
+                  name="delivery_type"
+                  value="takeaway"
+                  checked={form.delivery_type === 'takeaway'}
+                  onChange={handleChange}
+                />
+                Solo TakeAway
+              </RadioLabel>
+            </RadioGroup>
           </FormGroup>
 
           <Divider />
@@ -457,6 +496,33 @@ const CheckboxLabel = styled.label`
   color: #333;
 
   input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+    cursor: pointer;
+  }
+`;
+
+const RadioGroup = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+`;
+
+const RadioLabel = styled.label`
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+  font-size: 14px;
+  padding: 8px 12px;
+  border-radius: 4px;
+  transition: background-color 0.2s;
+
+  &:hover {
+    background-color: #f5f5f5;
+  }
+
+  input[type="radio"] {
     width: 18px;
     height: 18px;
     cursor: pointer;

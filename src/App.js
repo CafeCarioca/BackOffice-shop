@@ -10,6 +10,7 @@ import OrderDetails from './pages/OrderDetails';
 import { BrowserRouter as Router, Switch, Route} from "react-router-dom";
 import Products from './pages/Products';
 import Discounts from './pages/Discounts';
+import Coupons from './pages/Coupons';
 
 function App() {
   const token = "123456abcdef" // Token de autenticación
@@ -54,6 +55,9 @@ function App() {
               </Route>
               <Route path="/discounts" exact>
                 <Discounts />
+              </Route>
+              <Route path="/coupons" exact>
+                <Coupons />
               </Route>
               <Route path="/orders" exact>
                 <Orders />
