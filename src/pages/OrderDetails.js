@@ -22,6 +22,10 @@ const OrderDetails = ({ orderId }) => {
           status: order.status,
           total: parseFloat(order.total).toFixed(2),
           shippingType: order.shipping_type,
+          shippingCost: order.shipping_cost !== undefined ? parseFloat(order.shipping_cost) : null,
+          couponCode: order.coupon_code,
+          couponDiscount: order.coupon_discount !== undefined ? parseFloat(order.coupon_discount) : 0,
+          productDiscount: order.product_discount !== undefined ? parseFloat(order.product_discount) : 0,
           user: {
             username: order.user.username,
             email: order.user.email,
@@ -84,6 +88,19 @@ const OrderDetails = ({ orderId }) => {
 
   const { user, address, products } = orderData;
 
+  // Lógica de visualización del envío:
+  // 1. Si tenemos el dato guardado (shippingCost), lo usamos.
+  // 2. Si es una orden vieja (shippingCost es null), asumimos lógica simple: > 1500 es gratis.
+  let displayShippingPrice = "GRATIS";
+  
+  if (orderData.shippingCost !== null) {
+    displayShippingPrice = orderData.shippingCost > 0 ? `$${orderData.shippingCost.toFixed(2)}` : "GRATIS";
+  } else {
+    // Fallback para órdenes viejas
+    const total = parseFloat(orderData.total);
+    displayShippingPrice = total >= 1500 ? "GRATIS" : "$180.00";
+  }
+
   return (
     <OrderDetailsContainer>
       <h2>Detalles del Pedido</h2>
@@ -118,6 +135,15 @@ const OrderDetails = ({ orderId }) => {
             <p>Fecha del pedido: {new Date(orderData.orderDate).toLocaleDateString()}</p>
             <p>Estado: {orderData.status}</p>
             <p>Total: ${orderData.total}</p>
+            {orderData.productDiscount > 0 && (
+              <p>Descuento productos: -${orderData.productDiscount.toFixed(2)}</p>
+            )}
+            {orderData.couponCode && (
+              <>
+                <p>Cupón aplicado: {orderData.couponCode}</p>
+                <p>Descuento cupón: -${orderData.couponDiscount.toFixed(2)}</p>
+              </>
+            )}
             <p>Tipo de Envío: {orderData.shippingType}</p>
 
           </Section>
@@ -132,7 +158,7 @@ const OrderDetails = ({ orderId }) => {
             ))}
             {orderData.shippingType === 'delivery' && (
               <li style={{ fontWeight: 'bold', color: '#666', marginTop: '10px' }}>
-                Envío - Cantidad: 1 - Precio: $180.00
+                Envío - Cantidad: 1 - Precio: {displayShippingPrice}
               </li>
             )}
           </ul>

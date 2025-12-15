@@ -50,13 +50,16 @@ const Discounts = () => {
   };
 
   const handleToggleActive = async (discount) => {
+    console.log('Toggling discount:', discount.id, 'Current is_active:', discount.is_active, 'New value:', !discount.is_active);
     try {
-      await axios.put(`${API_ENDPOINTS.UPDATE_DISCOUNT}/${discount.id}`, {
+      const response = await axios.put(`${API_ENDPOINTS.UPDATE_DISCOUNT}/${discount.id}`, {
         is_active: !discount.is_active
       });
+      console.log('Response:', response.data);
       fetchDiscounts();
     } catch (error) {
       console.error('Error al actualizar descuento:', error);
+      console.error('Error details:', error.response?.data);
       alert('Error al actualizar descuento');
     }
   };
@@ -98,10 +101,10 @@ const Discounts = () => {
             <CardHeader>
               <DiscountName>{discount.name}</DiscountName>
               <BadgeContainer>
-                <StatusBadge active={isActive(discount)}>
+                <StatusBadge $active={isActive(discount)}>
                   {isActive(discount) ? 'ACTIVO' : 'INACTIVO'}
                 </StatusBadge>
-                <DeliveryTypeBadge deliveryType={discount.delivery_type || 'both'}>
+                <DeliveryTypeBadge $deliveryType={discount.delivery_type || 'both'}>
                   {discount.delivery_type === 'delivery' ? '🚚 Delivery' : 
                    discount.delivery_type === 'takeaway' ? '🏪 TakeAway' : 
                    '🚚🏪 Ambos'}
@@ -299,7 +302,7 @@ const DiscountName = styled.h3`
 `;
 
 const StatusBadge = styled.span`
-  background-color: ${props => props.active ? '#4CAF50' : '#9E9E9E'};
+  background-color: ${props => props.$active ? '#4CAF50' : '#9E9E9E'};
   color: white;
   padding: 3px 10px;
   border-radius: 10px;
@@ -319,8 +322,8 @@ const BadgeContainer = styled.div`
 
 const DeliveryTypeBadge = styled.span`
   background-color: ${props => 
-    props.deliveryType === 'delivery' ? '#2196F3' : 
-    props.deliveryType === 'takeaway' ? '#FF9800' : 
+    props.$deliveryType === 'delivery' ? '#2196F3' : 
+    props.$deliveryType === 'takeaway' ? '#FF9800' : 
     '#9C27B0'};
   color: white;
   padding: 3px 8px;
