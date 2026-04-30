@@ -113,6 +113,12 @@ const OrderDetails = ({ orderId }) => {
             <p>Nombre: {user.firstName} {user.lastName}</p>
             <p>Documento: {user.documentType} {user.documentNumber}</p>
             <p>Teléfono: {user.phone}</p>
+            {user.rut && (
+              <>
+                <p>RUT: {user.rut}</p>
+                {user.razonSocial && <p>Razón Social: {user.razonSocial}</p>}
+              </>
+            )}
           </Section>
           {orderData.shippingType !== 'takeaway' && address && (
             <AddressSection>
