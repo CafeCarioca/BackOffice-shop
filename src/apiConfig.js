@@ -33,5 +33,9 @@ export const API_ENDPOINTS = {
   // Products
   GET_PRODUCTS: `${API_BASE_URL}/products`,
 
-  // Agrega más endpoints según necesites
+  // Categorías
+  GET_CATEGORIES: `${API_BASE_URL}/categories`,
+  CREATE_CATEGORY: `${API_BASE_URL}/categories`,
+  UPDATE_CATEGORY: `${API_BASE_URL}/categories`,
+  DELETE_CATEGORY: `${API_BASE_URL}/categories`,
 };

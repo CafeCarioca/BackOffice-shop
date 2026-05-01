@@ -1,7 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
+import { API_ENDPOINTS } from '../apiConfig';
 import styled from 'styled-components';
 
 const CreateProductModal = ({ onClose, onCreate }) => {
+  const [categories, setCategories] = useState([]);
   const [form, setForm] = useState({
     name: '',
     category: 'coffee',
@@ -14,6 +17,15 @@ const CreateProductModal = ({ onClose, onCreate }) => {
     display_order: 999,
     presentations: []
   });
+
+  useEffect(() => {
+    axios.get(API_ENDPOINTS.GET_CATEGORIES).then(res => {
+      setCategories(res.data);
+      if (res.data.length > 0) {
+        setForm(prev => ({ ...prev, category: res.data[0].slug }));
+      }
+    }).catch(() => {});
+  }, []);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -66,9 +78,9 @@ const CreateProductModal = ({ onClose, onCreate }) => {
           <FormGroup>
             <label>Categoría</label>
             <select name="category" value={form.category} onChange={handleChange}>
-              <option value="coffee">Café</option>
-              <option value="capsules">Cápsulas</option>
-              <option value="others">Otros</option>
+              {categories.map(cat => (
+                <option key={cat.slug} value={cat.slug}>{cat.name}</option>
+              ))}
             </select>
           </FormGroup>
 

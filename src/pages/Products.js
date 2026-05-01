@@ -1,8 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
+import axios from 'axios';
 import { TheList } from '../styles/styled-elements';
 import EditProductModal from '../components/EditProductModal';
 import CreateProductModal from '../components/CreateProductModal';
+import { API_ENDPOINTS } from '../apiConfig';
 
 const Container = styled.div`
     flex: 1;
@@ -123,22 +125,26 @@ const NewButton = styled.button`
 
 const Products = () => {
     const [products, setProducts] = useState([]);
+    const [categories, setCategories] = useState([]);
     const [selectedProduct, setSelectedProduct] = useState(null);
     const [isEditing, setIsEditing] = useState(false);
     const [isCreating, setIsCreating] = useState(false);
 
     useEffect(() => {
-        const fetchProducts = async () => {
+        const fetchAll = async () => {
             const url = process.env.REACT_APP_API_URL || "http://localhost:3000";
             try {
-                const response = await fetch(`${url}/products`);
-                const data = await response.json();
-                setProducts(data);
+                const [prodsRes, catsRes] = await Promise.all([
+                    fetch(`${url}/products`),
+                    fetch(`${url}/categories`)
+                ]);
+                setProducts(await prodsRes.json());
+                setCategories(await catsRes.json());
             } catch (err) {
                 console.error('Error al cargar productos:', err);
             }
         };
-        fetchProducts();
+        fetchAll();
     }, []);
 
     const toggleAvailability = async (id, available) => {
@@ -243,18 +249,11 @@ const Products = () => {
         handleCloseModal();
     };
 
-    // Agrupar productos por categoría
-    const categoryNames = {
-        coffee: 'Café',
-        capsules: 'Cápsulas',
-        others: 'Otros'
-    };
-
-    const groupedProducts = {
-        coffee: products.filter(p => p.category === 'coffee'),
-        capsules: products.filter(p => p.category === 'capsules'),
-        others: products.filter(p => p.category === 'others')
-    };
+    // Agrupar productos por categoría dinámica
+    const groupedProducts = categories.reduce((acc, cat) => {
+        acc[cat.slug] = { name: cat.name, items: products.filter(p => p.category === cat.slug) };
+        return acc;
+    }, {});
 
     return (
         <TheList>
@@ -277,12 +276,12 @@ const Products = () => {
                     />
                 )}
 
-                {Object.entries(groupedProducts).map(([category, items]) => {
+                {Object.entries(groupedProducts).map(([category, { name, items }]) => {
                     if (items.length === 0) return null;
-                    
+
                     return (
                         <CategorySection key={category}>
-                            <CategoryTitle>{categoryNames[category]}</CategoryTitle>
+                            <CategoryTitle>{name}</CategoryTitle>
                             <Grid>
                                 {items.map((product) => (
                                     <Card key={product.id}>
