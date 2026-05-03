@@ -11,6 +11,7 @@ import { BrowserRouter as Router, Switch, Route} from "react-router-dom";
 import Products from './pages/Products';
 import Discounts from './pages/Discounts';
 import Coupons from './pages/Coupons';
+import Categories from './pages/Categories';
 
 function App() {
   const token = "123456abcdef" // Token de autenticación
@@ -58,6 +59,9 @@ function App() {
               </Route>
               <Route path="/coupons" exact>
                 <Coupons />
+              </Route>
+              <Route path="/categories" exact>
+                <Categories />
               </Route>
               <Route path="/orders" exact>
                 <Orders />

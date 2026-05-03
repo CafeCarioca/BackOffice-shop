@@ -1,5 +1,7 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import styled from "styled-components";
+import axios from "axios";
+import { API_ENDPOINTS } from "../apiConfig";
 
 const EditForm = ({ product, onClose, onUpdate }) => {
   const [form, setForm] = useState({ 
@@ -7,8 +9,12 @@ const EditForm = ({ product, onClose, onUpdate }) => {
     display_order: product.display_order || 999 
   });
   const [error, setError] = useState(null);
-  // Guardamos el estado original para comparar después
+  const [categories, setCategories] = useState([]);
   const originalProduct = useRef(JSON.parse(JSON.stringify(product)));
+
+  useEffect(() => {
+    axios.get(API_ENDPOINTS.GET_CATEGORIES).then(res => setCategories(res.data)).catch(() => {});
+  }, []);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -126,9 +132,9 @@ const EditForm = ({ product, onClose, onUpdate }) => {
       <FormGroup>
         <label>Categoría</label>
         <select name="category" value={form.category} onChange={handleChange}>
-          <option value="coffee">Café</option>
-          <option value="capsules">Cápsulas</option>
-          <option value="others">Otros</option>
+          {categories.map(cat => (
+            <option key={cat.slug} value={cat.slug}>{cat.name}</option>
+          ))}
         </select>
       </FormGroup>
 
