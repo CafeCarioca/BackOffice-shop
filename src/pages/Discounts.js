@@ -82,6 +82,20 @@ const Discounts = () => {
     return true;
   };
 
+  const getDiscountTypeLabel = (type) => {
+    if (type === 'percentage') return 'Porcentaje';
+    if (type === 'fixed_amount') return 'Monto fijo';
+    if (type === 'bogo') return '2x1';
+    return type;
+  };
+
+  const getDiscountValueLabel = (discount) => {
+    if (discount.discount_type === 'percentage') return `${discount.discount_value}%`;
+    if (discount.discount_type === 'fixed_amount') return `$${discount.discount_value}`;
+    if (discount.discount_type === 'bogo') return '2x1';
+    return discount.discount_value;
+  };
+
   if (loading) {
     return <Container><p>Cargando descuentos...</p></Container>;
   }
@@ -119,16 +133,14 @@ const Discounts = () => {
             <InfoRow>
               <InfoLabel>Tipo:</InfoLabel>
               <InfoValue>
-                {discount.discount_type === 'percentage' ? 'Porcentaje' : 'Monto fijo'}
+                {getDiscountTypeLabel(discount.discount_type)}
               </InfoValue>
             </InfoRow>
 
             <InfoRow>
               <InfoLabel>Valor:</InfoLabel>
               <DiscountValue type={discount.discount_type}>
-                {discount.discount_type === 'percentage' 
-                  ? `${discount.discount_value}%` 
-                  : `$${discount.discount_value}`}
+                {getDiscountValueLabel(discount)}
               </DiscountValue>
             </InfoRow>
 
@@ -366,7 +378,7 @@ const InfoValue = styled.span`
 `;
 
 const DiscountValue = styled.span`
-  color: ${props => props.type === 'percentage' ? '#FF6B6B' : '#4CAF50'};
+  color: ${props => props.type === 'percentage' ? '#FF6B6B' : props.type === 'bogo' ? '#9C27B0' : '#4CAF50'};
   font-size: 20px;
   font-weight: 700;
 `;

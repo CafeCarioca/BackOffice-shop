@@ -22,7 +22,8 @@ const CreateDiscountModal = ({ products, onClose, onSuccess }) => {
     const { name, value, type, checked } = e.target;
     setForm(prev => ({
       ...prev,
-      [name]: type === 'checkbox' ? checked : value
+      [name]: type === 'checkbox' ? checked : value,
+      ...(name === 'discount_type' && value === 'bogo' ? { discount_value: '1' } : {})
     }));
   };
 
@@ -47,12 +48,12 @@ const CreateDiscountModal = ({ products, onClose, onSuccess }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     
-    if (!form.name || !form.discount_value) {
+    if (!form.name || (form.discount_type !== 'bogo' && !form.discount_value)) {
       alert('Por favor completa los campos obligatorios');
       return;
     }
 
-    if (parseFloat(form.discount_value) <= 0) {
+    if (form.discount_type !== 'bogo' && parseFloat(form.discount_value) <= 0) {
       alert('El valor del descuento debe ser mayor a 0');
       return;
     }
@@ -67,7 +68,7 @@ const CreateDiscountModal = ({ products, onClose, onSuccess }) => {
     try {
       const payload = {
         ...form,
-        discount_value: parseFloat(form.discount_value),
+        discount_value: form.discount_type === 'bogo' ? 1 : parseFloat(form.discount_value),
         start_date: form.start_date || null,
         end_date: form.end_date || null
       };
@@ -137,26 +138,34 @@ const CreateDiscountModal = ({ products, onClose, onSuccess }) => {
               >
                 <option value="percentage">Porcentaje (%)</option>
                 <option value="fixed_amount">Monto fijo ($)</option>
+                <option value="bogo">2x1</option>
               </Select>
             </FormGroup>
 
-            <FormGroup>
-              <Label>
-                Valor *
-                {form.discount_type === 'percentage' ? ' (%)' : ' ($)'}
-              </Label>
-              <Input
-                type="number"
-                name="discount_value"
-                value={form.discount_value}
-                onChange={handleChange}
-                placeholder={form.discount_type === 'percentage' ? '15' : '200'}
-                step="0.01"
-                min="0"
-                max={form.discount_type === 'percentage' ? '100' : undefined}
-                required
-              />
-            </FormGroup>
+            {form.discount_type === 'bogo' ? (
+              <FormGroup>
+                <Label>Regla</Label>
+                <Helper>2 unidades iguales pagan 1. Aplica por pares.</Helper>
+              </FormGroup>
+            ) : (
+              <FormGroup>
+                <Label>
+                  Valor *
+                  {form.discount_type === 'percentage' ? ' (%)' : ' ($)'}
+                </Label>
+                <Input
+                  type="number"
+                  name="discount_value"
+                  value={form.discount_value}
+                  onChange={handleChange}
+                  placeholder={form.discount_type === 'percentage' ? '15' : '200'}
+                  step="0.01"
+                  min="0"
+                  max={form.discount_type === 'percentage' ? '100' : undefined}
+                  required
+                />
+              </FormGroup>
+            )}
           </FormRow>
 
           <FormRow>
