@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import axios from 'axios';
 import { API_ENDPOINTS } from '../apiConfig';
+import { authHeaders } from '../utils/authHeaders';
 
 const EditCouponModal = ({ coupon, onClose, onSuccess }) => {
   const [form, setForm] = useState({
@@ -81,7 +82,7 @@ const EditCouponModal = ({ coupon, onClose, onSuccess }) => {
         end_date: form.end_date || null
       };
 
-      await axios.put(`${API_ENDPOINTS.UPDATE_COUPON}/${coupon.id}`, payload);
+      await axios.put(`${API_ENDPOINTS.UPDATE_COUPON}/${coupon.id}`, payload, authHeaders());
       onSuccess();
     } catch (error) {
       console.error('Error al actualizar cupón:', error);

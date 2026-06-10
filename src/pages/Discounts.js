@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import axios from 'axios';
 import { API_ENDPOINTS } from '../apiConfig';
+import { authHeaders } from '../utils/authHeaders';
 import CreateDiscountModal from '../components/CreateDiscountModal';
 import EditDiscountModal from '../components/EditDiscountModal';
 
@@ -40,7 +41,7 @@ const Discounts = () => {
   const handleDelete = async (id) => {
     if (window.confirm('¿Estás seguro de eliminar este descuento?')) {
       try {
-        await axios.delete(`${API_ENDPOINTS.DELETE_DISCOUNT}/${id}`);
+        await axios.delete(`${API_ENDPOINTS.DELETE_DISCOUNT}/${id}`, authHeaders());
         fetchDiscounts();
       } catch (error) {
         console.error('Error al eliminar descuento:', error);
@@ -54,7 +55,7 @@ const Discounts = () => {
     try {
       const response = await axios.put(`${API_ENDPOINTS.UPDATE_DISCOUNT}/${discount.id}`, {
         is_active: !discount.is_active
-      });
+      }, authHeaders());
       console.log('Response:', response.data);
       fetchDiscounts();
     } catch (error) {

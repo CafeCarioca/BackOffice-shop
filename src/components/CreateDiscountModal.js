@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import styled from 'styled-components';
 import axios from 'axios';
 import { API_ENDPOINTS } from '../apiConfig';
+import { authHeaders } from '../utils/authHeaders';
 
 const CreateDiscountModal = ({ products, onClose, onSuccess }) => {
   const [form, setForm] = useState({
@@ -73,7 +74,7 @@ const CreateDiscountModal = ({ products, onClose, onSuccess }) => {
         end_date: form.end_date || null
       };
 
-      await axios.post(API_ENDPOINTS.CREATE_DISCOUNT, payload);
+      await axios.post(API_ENDPOINTS.CREATE_DISCOUNT, payload, authHeaders());
       onSuccess();
     } catch (error) {
       console.error('Error al crear descuento:', error);

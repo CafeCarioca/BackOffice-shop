@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import axios from 'axios';
 import { API_ENDPOINTS } from '../apiConfig';
+import { authHeaders } from '../utils/authHeaders';
 import CreateCouponModal from '../components/CreateCouponModal';
 import EditCouponModal from '../components/EditCouponModal';
 
@@ -17,7 +18,7 @@ const Coupons = () => {
 
   const fetchCoupons = async () => {
     try {
-      const response = await axios.get(API_ENDPOINTS.GET_COUPONS);
+      const response = await axios.get(API_ENDPOINTS.GET_COUPONS, authHeaders());
       setCoupons(response.data);
       setLoading(false);
     } catch (error) {
@@ -29,7 +30,7 @@ const Coupons = () => {
   const handleDelete = async (id) => {
     if (window.confirm('¿Estás seguro de eliminar este cupón?')) {
       try {
-        await axios.delete(`${API_ENDPOINTS.DELETE_COUPON}/${id}`);
+        await axios.delete(`${API_ENDPOINTS.DELETE_COUPON}/${id}`, authHeaders());
         fetchCoupons();
       } catch (error) {
         console.error('Error al eliminar cupón:', error);
@@ -42,7 +43,7 @@ const Coupons = () => {
     try {
       await axios.put(`${API_ENDPOINTS.UPDATE_COUPON}/${coupon.id}`, {
         is_active: !coupon.is_active
-      });
+      }, authHeaders());
       fetchCoupons();
     } catch (error) {
       console.error('Error al actualizar cupón:', error);
