@@ -51,16 +51,13 @@ const Discounts = () => {
   };
 
   const handleToggleActive = async (discount) => {
-    console.log('Toggling discount:', discount.id, 'Current is_active:', discount.is_active, 'New value:', !discount.is_active);
     try {
-      const response = await axios.put(`${API_ENDPOINTS.UPDATE_DISCOUNT}/${discount.id}`, {
+      await axios.put(`${API_ENDPOINTS.UPDATE_DISCOUNT}/${discount.id}`, {
         is_active: !discount.is_active
       }, authHeaders());
-      console.log('Response:', response.data);
       fetchDiscounts();
     } catch (error) {
       console.error('Error al actualizar descuento:', error);
-      console.error('Error details:', error.response?.data);
       alert('Error al actualizar descuento');
     }
   };
