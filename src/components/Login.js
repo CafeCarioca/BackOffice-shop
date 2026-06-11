@@ -10,7 +10,6 @@ const LoginComponent = ({ onLogin }) => {
 
     const handleSubmit = (event) => {
         event.preventDefault();
-        console.log("Usuario:", username, "Contraseña:", password);
 
         if (username && password) {
             onLogin(); // Cambia el estado de autenticación

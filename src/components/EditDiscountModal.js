@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import axios from 'axios';
 import { API_ENDPOINTS } from '../apiConfig';
+import { authHeaders } from '../utils/authHeaders';
 
 const EditDiscountModal = ({ discount, products, onClose, onSuccess }) => {
   const [form, setForm] = useState({
@@ -106,7 +107,7 @@ const EditDiscountModal = ({ discount, products, onClose, onSuccess }) => {
         delivery_type: form.delivery_type,
         start_date: form.start_date || null,
         end_date: form.end_date || null
-      });
+      }, authHeaders());
 
       // Obtener productos actuales del descuento
       const currentProductsResponse = await axios.get(`${API_ENDPOINTS.GET_DISCOUNT_PRODUCTS}/${discount.id}/products`);
@@ -120,12 +121,12 @@ const EditDiscountModal = ({ discount, products, onClose, onSuccess }) => {
       if (toAdd.length > 0) {
         await axios.post(`${API_ENDPOINTS.ADD_PRODUCTS_TO_DISCOUNT}/${discount.id}/products`, {
           product_ids: toAdd
-        });
+        }, authHeaders());
       }
 
       // Remover productos
       for (const productId of toRemove) {
-        await axios.delete(`${API_ENDPOINTS.DELETE_DISCOUNT}/${discount.id}/products/${productId}`);
+        await axios.delete(`${API_ENDPOINTS.DELETE_DISCOUNT}/${discount.id}/products/${productId}`, authHeaders());
       }
 
       onSuccess();

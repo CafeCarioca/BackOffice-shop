@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import styled from 'styled-components';
 import axios from 'axios';
 import { API_ENDPOINTS } from '../apiConfig';
+import { authHeaders } from '../utils/authHeaders';
 
 const CreateCouponModal = ({ onClose, onSuccess }) => {
   const [form, setForm] = useState({
@@ -63,7 +64,7 @@ const CreateCouponModal = ({ onClose, onSuccess }) => {
         end_date: form.end_date || null
       };
 
-      await axios.post(API_ENDPOINTS.CREATE_COUPON, payload);
+      await axios.post(API_ENDPOINTS.CREATE_COUPON, payload, authHeaders());
       onSuccess();
     } catch (error) {
       console.error('Error al crear cupón:', error);
