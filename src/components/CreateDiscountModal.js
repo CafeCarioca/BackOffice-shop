@@ -14,7 +14,8 @@ const CreateDiscountModal = ({ products, onClose, onSuccess }) => {
     delivery_type: 'both',
     start_date: '',
     end_date: '',
-    product_ids: []
+    product_ids: [],
+    presentation_ids: []
   });
 
   const [loading, setLoading] = useState(false);
@@ -28,12 +29,33 @@ const CreateDiscountModal = ({ products, onClose, onSuccess }) => {
     }));
   };
 
-  const handleProductToggle = (productId) => {
+  const handleProductToggle = (product) => {
+    const productId = product.id;
     setForm(prev => ({
       ...prev,
       product_ids: prev.product_ids.includes(productId)
         ? prev.product_ids.filter(id => id !== productId)
-        : [...prev.product_ids, productId]
+        : [...prev.product_ids, productId],
+      presentation_ids: prev.product_ids.includes(productId)
+        ? prev.presentation_ids.filter(id => !(product.presentations || []).some(p => p.id === id))
+        : prev.presentation_ids
+    }));
+  };
+
+  const handlePresentationToggle = (presentationId) => {
+    setForm(prev => ({
+      ...prev,
+      presentation_ids: prev.presentation_ids.includes(presentationId)
+        ? prev.presentation_ids.filter(id => id !== presentationId)
+        : [...prev.presentation_ids, presentationId]
+    }));
+  };
+
+  const selectAllPresentationsForProduct = (product) => {
+    const ids = (product.presentations || []).map(p => p.id);
+    setForm(prev => ({
+      ...prev,
+      presentation_ids: prev.presentation_ids.filter(id => !ids.includes(id))
     }));
   };
 
@@ -260,17 +282,42 @@ const CreateDiscountModal = ({ products, onClose, onSuccess }) => {
                 <CategoryGroup key={category}>
                   <CategoryTitle>{categoryMap[category] || category}</CategoryTitle>
                   {categoryProducts.map(product => (
-                    <ProductItem key={product.id}>
+                    <ProductBlock key={product.id}>
+                    <ProductItem>
                       <Checkbox
                         type="checkbox"
                         checked={form.product_ids.includes(product.id)}
-                        onChange={() => handleProductToggle(product.id)}
+                        onChange={() => handleProductToggle(product)}
                       />
                       <ProductLabel>
                         <ProductName>{product.name}</ProductName>
                         <ProductPrice>${product.price}</ProductPrice>
                       </ProductLabel>
                     </ProductItem>
+                    {form.product_ids.includes(product.id) && product.presentations?.length > 0 && (
+                      <PresentationOptions>
+                        <PresentationOption>
+                          <input
+                            type="radio"
+                            name={`presentations-${product.id}`}
+                            checked={!product.presentations.some(p => form.presentation_ids.includes(p.id))}
+                            onChange={() => selectAllPresentationsForProduct(product)}
+                          />
+                          Todas las presentaciones
+                        </PresentationOption>
+                        {product.presentations.map(presentation => (
+                          <PresentationOption key={presentation.id}>
+                            <input
+                              type="checkbox"
+                              checked={form.presentation_ids.includes(presentation.id)}
+                              onChange={() => handlePresentationToggle(presentation.id)}
+                            />
+                            {presentation.weight} — ${presentation.price}
+                          </PresentationOption>
+                        ))}
+                      </PresentationOptions>
+                    )}
+                    </ProductBlock>
                   ))}
                 </CategoryGroup>
               ))}
@@ -541,6 +588,27 @@ const ProductItem = styled.div`
   &:hover {
     background-color: #f5f5f5;
   }
+`;
+
+const ProductBlock = styled.div`
+  margin-bottom: 4px;
+`;
+
+const PresentationOptions = styled.div`
+  margin: 0 0 10px 38px;
+  padding: 8px 12px;
+  background: #f8f8f8;
+  border-radius: 6px;
+`;
+
+const PresentationOption = styled.label`
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 6px 0;
+  color: #555;
+  font-size: 13px;
+  cursor: pointer;
 `;
 
 const Checkbox = styled.input`
