@@ -5,6 +5,7 @@ import { API_ENDPOINTS } from '../apiConfig';
 import { authHeaders } from '../utils/authHeaders';
 import CreateDiscountModal from '../components/CreateDiscountModal';
 import EditDiscountModal from '../components/EditDiscountModal';
+import { WEEKDAYS } from '../utils/weekdays';
 
 const Discounts = () => {
   const [discounts, setDiscounts] = useState([]);
@@ -121,6 +122,9 @@ const Discounts = () => {
                    discount.delivery_type === 'takeaway' ? '🏪 TakeAway' : 
                    '🚚🏪 Ambos'}
                 </DeliveryTypeBadge>
+                {discount.weekday !== null && discount.weekday !== undefined && (
+                  <DeliveryTypeBadge $deliveryType="both">Solo los {WEEKDAYS[discount.weekday].toLowerCase()}</DeliveryTypeBadge>
+                )}
               </BadgeContainer>
             </CardHeader>
 

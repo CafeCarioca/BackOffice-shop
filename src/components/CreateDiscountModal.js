@@ -3,6 +3,7 @@ import styled from 'styled-components';
 import axios from 'axios';
 import { API_ENDPOINTS } from '../apiConfig';
 import { authHeaders } from '../utils/authHeaders';
+import { WEEKDAYS, weekdayFromForm } from '../utils/weekdays';
 
 const CreateDiscountModal = ({ products, onClose, onSuccess }) => {
   const [form, setForm] = useState({
@@ -14,6 +15,7 @@ const CreateDiscountModal = ({ products, onClose, onSuccess }) => {
     delivery_type: 'both',
     start_date: '',
     end_date: '',
+    weekday: '',
     product_ids: [],
     presentation_ids: []
   });
@@ -93,7 +95,8 @@ const CreateDiscountModal = ({ products, onClose, onSuccess }) => {
         ...form,
         discount_value: form.discount_type === 'bogo' ? 1 : parseFloat(form.discount_value),
         start_date: form.start_date || null,
-        end_date: form.end_date || null
+        end_date: form.end_date || null,
+        weekday: weekdayFromForm(form.weekday)
       };
 
       await axios.post(API_ENDPOINTS.CREATE_DISCOUNT, payload, authHeaders());
@@ -226,6 +229,16 @@ const CreateDiscountModal = ({ products, onClose, onSuccess }) => {
               />
               Activar descuento inmediatamente
             </CheckboxLabel>
+          </FormGroup>
+
+          <FormGroup>
+            <Label>Día de la semana</Label>
+            <Select name="weekday" value={form.weekday} onChange={handleChange}>
+              <option value="">Todos los días</option>
+              {WEEKDAYS.map((day, i) => (
+                <option key={day} value={String(i)}>Solo los {day.toLowerCase()}</option>
+              ))}
+            </Select>
           </FormGroup>
 
           <FormGroup>

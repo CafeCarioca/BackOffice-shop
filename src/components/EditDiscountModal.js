@@ -3,6 +3,7 @@ import styled from 'styled-components';
 import axios from 'axios';
 import { API_ENDPOINTS } from '../apiConfig';
 import { authHeaders } from '../utils/authHeaders';
+import { WEEKDAYS, weekdayToForm, weekdayFromForm } from '../utils/weekdays';
 
 const EditDiscountModal = ({ discount, products, onClose, onSuccess }) => {
   const [form, setForm] = useState({
@@ -14,6 +15,7 @@ const EditDiscountModal = ({ discount, products, onClose, onSuccess }) => {
     delivery_type: 'both',
     start_date: '',
     end_date: '',
+    weekday: '',
     product_ids: [],
     presentation_ids: []
   });
@@ -40,6 +42,7 @@ const EditDiscountModal = ({ discount, products, onClose, onSuccess }) => {
         delivery_type: discountData.delivery_type || 'both',
         start_date: discountData.start_date ? discountData.start_date.split('T')[0] : '',
         end_date: discountData.end_date ? discountData.end_date.split('T')[0] : '',
+        weekday: weekdayToForm(discountData.weekday),
         product_ids: discountData.products ? discountData.products.map(p => p.id) : [],
         presentation_ids: discountData.presentation_ids || []
       });
@@ -130,6 +133,7 @@ const EditDiscountModal = ({ discount, products, onClose, onSuccess }) => {
         delivery_type: form.delivery_type,
         start_date: form.start_date || null,
         end_date: form.end_date || null,
+        weekday: weekdayFromForm(form.weekday),
         presentation_ids: form.presentation_ids
       }, authHeaders());
 
@@ -292,6 +296,16 @@ const EditDiscountModal = ({ discount, products, onClose, onSuccess }) => {
               />
               Descuento activo
             </CheckboxLabel>
+          </FormGroup>
+
+          <FormGroup>
+            <Label>Día de la semana</Label>
+            <Select name="weekday" value={form.weekday} onChange={handleChange}>
+              <option value="">Todos los días</option>
+              {WEEKDAYS.map((day, i) => (
+                <option key={day} value={String(i)}>Solo los {day.toLowerCase()}</option>
+              ))}
+            </Select>
           </FormGroup>
 
           <FormGroup>
